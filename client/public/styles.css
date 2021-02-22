@@ -1,0 +1,19 @@
+
+html,
+#root,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100%;
+  background: rgb(30,217,149);
+  background: linear-gradient(137deg, rgba(30,217,149,1) 0%, rgba(0,125,255,1) 88%);
+  color: white;
+}

@@ -1,0 +1,28 @@
+.home-select-screen{
+    background-color: #222;
+    border-radius: 15px;
+    padding: 60px 80px;
+    color: white;
+}
+.header-home{
+    display: flex;
+    align-items: center;
+    margin: auto;
+    justify-content: center;
+    height: 70px;
+}
+.details{
+    margin: 2rem 0;
+    font-size: 1rem;
+}
+.header-home span{
+    padding-right: 15px;
+}
+.button-select{
+    display: flex;
+    justify-content: center
+}
+.btn-group{
+    width: auto;
+    margin: auto;
+}

@@ -1,0 +1,19 @@
+a{
+    text-decoration: none;
+    color:white;
+    font-weight: 700;
+}
+.layout-footer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+    height: 47px;
+    padding-top: 25px;
+    text-align: center;
+}
+.footer-info{
+    width: 75%;
+    display: flex;
+    justify-content: space-between;
+}
