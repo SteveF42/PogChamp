@@ -1,8 +1,8 @@
 const router = require('express').Router()
 const tokens = require('../database/Models/tokens')
 const fetch = require('node-fetch')
+const querystring = require('querystring')
 require('dotenv')
-const redirect_uri = 'http://192.168.1.52:5000/spotify/callback'
 
 Date.prototype.addHours = function (h) {
     this.setTime(this.getTime() + (h * 60 * 60 * 1000));
@@ -10,39 +10,42 @@ Date.prototype.addHours = function (h) {
 }
 
 router.get('/getAuthUrl', async (req, res) => {
-    const url = `https://accounts.spotify.com/authorize?response_type=code&client_id=${process.env.SPOTIFY_CLIENT_ID}&scope=${process.env.SPOTIFY_SCOPE}&redirect_uri=${redirect_uri}`
+    const url = `https://accounts.spotify.com/authorize?response_type=code&client_id=${process.env.SPOTIFY_CLIENT_ID}&scope=${process.env.SPOTIFY_SCOPE}&redirect_uri=${process.env.SPOTIFY_REDIRECT_URI}`
 
     res.json({ url: url })
 })
 
-router.get('/callback', async (req, res) => {
-    const code = req.query.code
-    const error = req.query.error
-    if(error == 'access_denied'){
-        res.redirect('http://localhost:3000/')
-        return;
-    }
+router.post('/callback', async (req, res) => {
+    const code = req.body.code
+    console.log('callback', req.sessionID)
 
     const response = await fetch('https://accounts.spotify.com/api/token', {
         method: 'POST',
-        body: {
+        headers:{
+            "Accept": "application/json",
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: querystring.stringify({
             grant_type: 'authorization_code',
             code: code,
-            redirect_uri: redirect_uri
-        }
+            redirect_uri: process.env.SPOTIFY_REDIRECT_URI,
+            client_id : process.env.SPOTIFY_CLIENT_ID,
+            client_secret:process.env.SPOTIFY_CLIENT_SECRET
+        })
     })
     const data = await response.json()
 
     if (req.session.hasValidToken == null) {
-        req.session['hasValidToken'] = true
+        req.session['authenticated'] = true
     }
     updateOrCreateTokens(data, req.session.id)
 
-    res.redirect('http://localhost:3000/')
+    res.status(200).json({success:true})
 })
 
 router.get('/isAuthenticated',async (req,res)=>{
-    const auth = isAuthenticated(req.session.id)
+    const auth = await isAuthenticated(req.session.id)
+    console.log(req.session.id)
     res.status(200).json({authenticated:auth})
 })
 
@@ -75,8 +78,8 @@ const isAuthenticated = async (sessionID) => {
 const updateOrCreateTokens = async (data, sessionID) => {
     const token = await getTokens(sessionID)
     const date = new Date()
-    date.addHours(data.expires_in / 60 / 60)
-    const expires_in = date.addHours(date.getHours)
+    const expires_in = date.addHours(data.expires_in / 60 / 60)
+    
     //creates a new token object if the user doesn't already have one
     if (token == null) {
         const Token = new tokens({

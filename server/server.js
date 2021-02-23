@@ -24,7 +24,7 @@ db.connect((err) => {
 app.use(express.static(path.join(__dirname,'build')))
 
 //middleware
-app.use(cors({origin:'http://localhost:3000',credentials:true}))
+// app.use(cors({origin:'http://localhost:3000',credentials:true}))
 app.use(session({
     secret: process.env.SECRET_KEY,
     store: new MongoStore({
@@ -33,6 +33,9 @@ app.use(session({
     }),
     resave: false,
     saveUninitialized: true,
+    cookie:{
+        httpOnly:true,
+    }
 }))
 
 app.use(bodyParser.urlencoded({

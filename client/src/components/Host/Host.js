@@ -70,15 +70,17 @@ const Host = () => {
 
     const createRoom = async () => {
         //sends a request to the server to create a new room
-        const isAuthenticated = await fetch('/spotify/isAuthenticated')
+        const isAuthenticated = await fetch('/spotify/isAuthenticated',{
+            credentials:'include'
+        })
         const authData = await isAuthenticated.json()
-        if(authData.authenticated){
-            const getSpotifyLogin = await fetch('/spotify/getAuthUrl')
+        console.log(authData)
+        if(!authData.authenticated){
+            const getSpotifyLogin = await fetch('/spotify/getAuthUrl',{credentials:'include'})
             const spotifyLogin = await getSpotifyLogin.json()
-            window.location = spotifyLogin.url
+            window.location.assign(spotifyLogin.url)
         }
         
-        return
         const data = {
             votesToSkip: votesToSkip,
             usersCanQueue: allowQueue,
