@@ -7,7 +7,7 @@
     "start": "node server.js",
     "server": "nodemon ./server/server.js",
     "client": "npm start --prefix client",
-    "build-client":"cd client && npm run build",
+    "build-client": "cd client && npm run build",
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "keywords": [
@@ -29,6 +29,7 @@
     "express-session": "^1.17.1",
     "http-proxy-middleware": "^1.0.6",
     "mongoose": "^5.11.16",
+    "node-fetch": "^2.6.1",
     "random-key": "^0.3.2",
     "react-native": "^0.63.4"
   },
