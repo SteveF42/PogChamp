@@ -6,6 +6,10 @@ const server = require('http').createServer(app)
 const api = require('./routes/api')
 const spotify = require('./routes/spotify')
 const db = require('./database/mongodb')
+const bodyParser = require('body-parser')
+const mongoose = require('mongoose')
+const cors = require('cors')
+const path = require('path')
 require('dotenv').config()
 
 db.connect((err) => {
@@ -14,26 +18,32 @@ db.connect((err) => {
     } else {
         console.log('server running on port 5000')
         server.listen(5000)
-        afterConn()
     }
 })
 
-const afterConn = () => {
-    app.use(session({
-        secret: process.env.SECRET_KEY,
-        store: new MongoStore({
-            mongooseConnection: db.mongo.connection,
-            ttl: 1*24*60*60, //1 day
-        }),
-        resave: false,
-        saveUninitialized:false,
-    }))
-}
-
+app.use(express.static(path.join(__dirname,'build')))
 
 //middleware
-app.use(express.json())
-app.use('/api', api)
-app.use('/spotify', spotify)
+// app.use(cors({origin:'http://localhost:3000',credentials:true}))
+app.use(session({
+    secret: process.env.SECRET_KEY,
+    store: new MongoStore({
+        mongooseConnection: mongoose.connection,
+        ttl: 1 * 24 * 60 * 60, //1 day
+    }),
+    resave: false,
+    saveUninitialized: true,
+}))
 
+app.use(bodyParser.urlencoded({
+    extended:true
+}))
+app.use(express.json())
+
+
+app.use('/api',api)
+app.use('/spotify', spotify)
+app.use('*',(req,res)=>{
+    res.sendFile('build/index.html',{root:'./server'})
+})
 

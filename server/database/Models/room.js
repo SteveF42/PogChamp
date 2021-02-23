@@ -3,10 +3,12 @@ const mongoose = require('mongoose')
 
 
 const RoomSchema = new mongoose.Schema({
-    code: {Type:String, required:true},
-    votesToSkip: {Type:Number, default: 0},
-    votes: {Type: Number, default:0},
-    host: {Type:String, required: true}
+    code: {type:String, unique : true, required : true},
+    host: {type:String, unique : true, required : true},
+    votesToSkip: {type: Number, default:0, required:true},
+    usersCanQueue: {type:Boolean, required:true},
+    usersCanSkip: {type:Boolean, required:true},
+
 })
 
-mongoose.model('rooms',RoomSchema,'rooms')
+module.exports =  mongoose.model('rooms',RoomSchema)

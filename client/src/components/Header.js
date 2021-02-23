@@ -1,10 +1,11 @@
 import React from 'react'
+import {Link} from 'react-router-dom'
 
 const Header = () => {
     return (
         <div style={styles.header} href="/">
-            <span style={styles.span}><a href="/" style={styles.a}>Logo</a></span>
-            <h2> <a href="/" style={styles.a}>Pogify</a></h2>
+            <span style={styles.span}><Link to="/" style={styles.a}>Logo</Link></span>
+            <h2> <Link to="/" style={styles.a}>Pogify</Link></h2>
         </div>
     )
 }

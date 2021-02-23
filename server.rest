@@ -1,0 +1,9 @@
+POST http://localhost:5000/api/createRoom
+Content-Type: application/json
+
+{
+    "votesToSkip": 2,
+    "usersCanQueue": true,
+    "usersCanSkip": false,
+    "override": false
+}

@@ -7,7 +7,8 @@ const mongo = {
 
 options = {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useCreateIndex: true
 }
 
 const connect = (cb) => {   

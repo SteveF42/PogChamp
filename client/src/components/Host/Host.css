@@ -1,0 +1,26 @@
+.container{
+    background-color: #222;
+    border-radius: 15px;
+    padding: 60px 80px;
+    color: white;
+}
+
+.select-options{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.rejoin-room{
+    margin-bottom: 25px;
+}
+.create-new-room{
+    display: flex;
+    flex-direction: column;
+    padding-top: 25px
+}
+.options{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
