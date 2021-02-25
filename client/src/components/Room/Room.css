@@ -1,0 +1,44 @@
+.container{
+    width: 70%;
+}
+.topItems{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.queueSwitch{
+    display: flex;
+    flex-direction: row;
+}
+.musicContainer{
+    width: 100%;
+}
+.musicPlayer{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+.rightHalf{
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    bottom:0px;
+    justify-content: space-between;
+}
+.artists{
+    margin: 0;
+}
+.trackButtons{
+    display: flex;
+    justify-content: space-between;
+}
+.skip{
+    margin:auto
+}
+.pauseOrPlay{
+    margin:auto
+}
+.audioController{
+    bottom:0px;
+}

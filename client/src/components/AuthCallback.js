@@ -21,6 +21,7 @@ const AuthCallback = () => {
                 })
                 if(res.status===200){
                     window.history.replaceState(null,null,'/host')
+                    window.location = '/host'
                 }
             }else if(urlParams.has('error')){
                 window.history.go(-2)

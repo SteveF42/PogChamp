@@ -1,6 +1,8 @@
 const router = require('express').Router()
-const tokens = require('../database/Models/tokens')
 const fetch = require('node-fetch')
+const {isAuthenticated,refreshTokens,updateOrCreateTokens,callSpotifyApi} = require('./spotifyUtils/utils')
+const Rooms = require('../database/Models/room')
+const Tokens = require('../database/Models/tokens')
 const querystring = require('querystring')
 require('dotenv')
 
@@ -11,7 +13,6 @@ Date.prototype.addHours = function (h) {
 
 router.get('/getAuthUrl', async (req, res) => {
     const url = `https://accounts.spotify.com/authorize?response_type=code&client_id=${process.env.SPOTIFY_CLIENT_ID}&scope=${process.env.SPOTIFY_SCOPE}&redirect_uri=${process.env.SPOTIFY_REDIRECT_URI}`
-
     res.json({ url: url })
 })
 
@@ -44,70 +45,70 @@ router.post('/callback', async (req, res) => {
 })
 
 router.get('/isAuthenticated',async (req,res)=>{
-    const auth = await isAuthenticated(req.session.id)
-    console.log(req.session.id)
-    res.status(200).json({authenticated:auth})
+    try{
+        const auth = await isAuthenticated(req.session.id)
+        res.status(200).json({authenticated:auth})
+    }catch(err){
+        console.log(err)
+        res.status(501).json({message:err,authenticated:false})
+    }
 })
 
-const refreshTokens = async (tokens)=>{
-    const response = await fetch('https://accounts.spotify.com/api/token',{
-        method:'POST',
-        body:{
-            grant_type:'refresh_token',
-            refresh_token: tokens.refresh_token 
-        }
-    })
-    const data = await response.json()
-    
-    updateOrCreateTokens(data)
-}
+router.put('/play',async (req,res)=>{
+    const apiEndPoint = 'me/player/play'
+    const room = await Rooms.findOne({code:req.body.code})
 
-const isAuthenticated = async (sessionID) => {
-    const tokens = await getTokens(sessionID)
-    const date = new Date
-    if(tokens!=null){
-        if(tokens.expires_in <= date){
-            refreshTokens(tokens)
-        }
-        return true
+    if(room == null) {res.status(404); return}
+
+    const host = room.host
+    if(req.sessionID === host || room.usersCanPlayPause){
+        callSpotifyApi(apiEndPoint,host,'PUT')
     }
+    res.status(200).json({message:'success'})
 
-    return false
-}
+})
 
-const updateOrCreateTokens = async (data, sessionID) => {
-    const token = await getTokens(sessionID)
-    const date = new Date()
-    const expires_in = date.addHours(data.expires_in / 60 / 60)
-    
-    //creates a new token object if the user doesn't already have one
-    if (token == null) {
-        const Token = new tokens({
-            user: sessionID,
-            access_token: data.access_token,
-            token_type: data.token_type,
-            scope: data.scope,
-            expires_in: expires_in,
-            refresh_token: data.refresh_token
-        })
-        Token.save()
+router.put('/pause',async (req,res) => {
+    const apiEndPoint = 'me/player/pause'
+    const room = await Rooms.findOne({code:req.body.code})
+    if(room == null){res.status(404);return}
 
-        //updates the users tokens 
-    } else {
-        token.access_token = data.access_token,
-            token.token_type = data.token_type,
-            token.scope = data.scope,
-            token.expires_in = expires_in,
-            token.refresh_token = data.refresh_token
-        token.save()
+    const host = room.host
+    if(req.sessionID === host || room.usersCanPlayPause){
+        callSpotifyApi(apiEndPoint,host,'PUT')
     }
-}
+    res.status(200).json({message:'success'})
+})
 
+router.post('/refreshTokens', async (req,res) => {
+    try{
+        const tokens = await Tokens.findOne({user:req.session.id})
+        const response = await refreshTokens(tokens,req.sessionID)
+        if(response.error!=null){
+            res.status(401).json({message:response.error_description})
+        }else{
+            res.status(200)
+        }
+    }catch(err){
+        console.log(err)
+        res.status(401).json({message:'access denied'})
+    }
+})
 
-const getTokens = async (sessionID) => {
-    const token = await tokens.findOne({ user: sessionID })
-    return token
-}
+router.post('/currentlyPlaying', async (req,res) => {
+    const apiEndPoint = 'me/player/currently-playing'
+    const room = await Rooms.findOne({code:req.body.code})
+    if(room == null){res.status(404);return}
 
+    const host = room.host
+    const response = await callSpotifyApi(apiEndPoint,host,'GET')
+    
+    try{
+        const json = await response.json()
+        res.status(200).json({song:json})
+    }catch(err){
+        res.status(204).json({song:err})
+    }
+})
 
 module.exports = router

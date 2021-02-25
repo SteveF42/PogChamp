@@ -5,7 +5,7 @@ const Header = () => {
     return (
         <div style={styles.header} href="/">
             <span style={styles.span}><Link to="/" style={styles.a}>Logo</Link></span>
-            <h2> <Link to="/" style={styles.a}>Pogify</Link></h2>
+            <h2> <Link to="/" style={styles.a}>POGCHAMP</Link></h2>
         </div>
     )
 }

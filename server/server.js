@@ -24,12 +24,12 @@ db.connect((err) => {
 app.use(express.static(path.join(__dirname,'build')))
 
 //middleware
-// app.use(cors({origin:'http://localhost:3000',credentials:true}))
+app.use(cors({origin:'http://localhost:3000',credentials:true}))
 app.use(session({
     secret: process.env.SECRET_KEY,
     store: new MongoStore({
         mongooseConnection: mongoose.connection,
-        ttl: 1 * 24 * 60 * 60, //1 day
+        ttl: 30 * 24 * 60 * 60, //30 days
     }),
     resave: false,
     saveUninitialized: true,

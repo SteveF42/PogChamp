@@ -48,15 +48,16 @@ const Host = () => {
     const [session, setSession] = useState(null)
     const [allowQueue, setAllowQueue] = useState(false)
     const [allowSkip, setAllowSkip] = useState(false)
+    const [allowPlayPause, setAllowPlayPause] = useState(false)
     const [votesToSkip, setVotesToSkip] = useState(1)
 
 
     useEffect(() => {
         const getRoom = async () => {
-            const response = await fetch('/api/createRoom',{
+            const response = await fetch('/api/createRoom', {
                 credentials: 'include',
-                headers:{
-                    'Content-Type':'application/json',
+                headers: {
+                    'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 }
             })
@@ -67,43 +68,63 @@ const Host = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    //gets spotify redirect url
+    const getSpotifyLogin = async () => {
+        const getSpotifyLogin = await fetch('/spotify/getAuthUrl', { credentials: 'include' })
+        const spotifyLogin = await getSpotifyLogin.json()
+        window.location.assign(spotifyLogin.url)
+    }
 
     const createRoom = async () => {
         //sends a request to the server to create a new room
-        const isAuthenticated = await fetch('/spotify/isAuthenticated',{
-            credentials:'include'
+        const isAuthenticated = await fetch('/spotify/isAuthenticated', {
+            credentials: 'include'
         })
         const authData = await isAuthenticated.json()
+
         console.log(authData)
-        if(!authData.authenticated){
-            const getSpotifyLogin = await fetch('/spotify/getAuthUrl',{credentials:'include'})
-            const spotifyLogin = await getSpotifyLogin.json()
-            window.location.assign(spotifyLogin.url)
-        }
-        
-        const data = {
-            votesToSkip: votesToSkip,
-            usersCanQueue: allowQueue,
-            usersCanSkip: allowSkip,
-            override: session != null
-        }
 
-        const res = await fetch('/api/createRoom', {
-            method: "POST",
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        })
+        //if something went wrong and the user isn't logged in or user tokens are invalid they'll need to login
+        if (!authData.authenticated) {
+            getSpotifyLogin()
+        } else {
+        //if not then just create a room and send them to it
+            const data = {
+                votesToSkip: votesToSkip,
+                usersCanQueue: allowQueue,
+                usersCanSkip: allowSkip,
+                usersCanPlayPause: allowPlayPause,
+                override: session != null
+            }
 
-        const json = await res.json()
-        console.log(json.Room)
-        window.location.href = `/room/${json.Room.code}`
+            const res = await fetch('/api/createRoom', {
+                method: "POST",
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+
+            const json = await res.json()
+            console.log(json.Room)
+            window.localStorage.setItem('code',json.Room.code)
+            window.location.href = `/room/${json.Room.code}`
+        }
     }
-    const returnToRoom = () => {
+    //shows that the user already has an active session going 
+    const returnToRoom = async () => {
         //redirect user back to old room 
-        window.location.href = `/room/${session.code}`
+        const isAuthenticated = await fetch('/spotify/isAuthenticated', {
+            credentials: 'include'
+        })
+        const data = await isAuthenticated.json()
+        if(!data.authenticated){
+            getSpotifyLogin()
+        }else{       
+            window.localStorage.setItem('code',session.code)
+            window.location = `/room/${session.code}`
+        }
     }
 
 
@@ -126,6 +147,10 @@ const Host = () => {
                             <FormControlLabel
                                 control={<CustomCheckBox color="default" onClick={() => setAllowSkip(!allowSkip)} />}
                                 label="Allow users to skip songs"
+                            />
+                            <FormControlLabel
+                                control={<CustomCheckBox color="default" onClick={() => setAllowPlayPause(!allowPlayPause)} />}
+                                label="Allow users to Play/Pause music"
                             />
                         </div>
                     </div>

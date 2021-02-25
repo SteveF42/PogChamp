@@ -11,7 +11,7 @@ const Home = () => {
                 <span>
                     logo
                 </span>
-                <h1 style={{ fontSize: '3rem', fontWeight: '400' }}>POGIFY!!</h1>
+                <h1 style={{ fontSize: '3rem', fontWeight: '400' }}>POGCHAMP!!</h1>
             </div>
 
             <p className="details">Select a room to join or host your own! 'requires spotify premium' </p>

@@ -8,6 +8,8 @@ const RoomSchema = new mongoose.Schema({
     votesToSkip: {type: Number, default:0, required:true},
     usersCanQueue: {type:Boolean, required:true},
     usersCanSkip: {type:Boolean, required:true},
+    usersCanPlayPause:{type:Boolean, required:true, default: false},
+    expireAt: {type:Date, index:{expireAfterSeconds:0}}
 
 })
 
