@@ -1,7 +1,7 @@
-import React from 'react'
-import {TextField, withStyles} from '@material-ui/core'
-import {green} from '@material-ui/core/colors'
-import {GreenButton} from '../Buttons'
+import { useState } from 'react'
+import { TextField, withStyles, FormHelperText } from '@material-ui/core'
+import { green } from '@material-ui/core/colors'
+import { GreenButton } from '../Buttons'
 import './Join.css'
 
 const TextStyled = withStyles({
@@ -32,12 +32,32 @@ const TextStyled = withStyles({
     }
 })(TextField)
 
+
 const Create = () => {
+    const [error, setError] = useState(false)
+    const [helperText, setHelperText] = useState('')
+    const [code, setCode] = useState('')
+
+    const onRoomJoin = async (e) => {
+        console.log(code)
+        const res = await fetch(`/api/getRoom/${code}`)
+        if (res.status === 404) {
+            setError(true)
+            setHelperText('invalid room code')
+            e.target.value=''
+        }
+        if(res.status===200){
+            window.localStorage.setItem('code',code)
+            window.location = `/room/${code}`
+        }
+    }
+
     return (
         <div className="container join-container">
-            <TextStyled variant="outlined" label="Input Room Code" />
+            <TextStyled error={error} variant="outlined" label="Input Room Code" value={code} onChange={(e)=>setCode(e.target.value.toUpperCase())}/>
+            <FormHelperText error={error}>{helperText}</FormHelperText>
             <div className="bottom">
-                <GreenButton size="large" className="btn">JOIN</GreenButton>
+                <GreenButton onClick={onRoomJoin} size="large" className="btn">JOIN</GreenButton>
             </div>
         </div>
     )

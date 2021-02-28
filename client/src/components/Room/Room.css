@@ -1,5 +1,9 @@
-.container{
-    width: 70%;
+.roomContainer{
+    background-color: #222;
+    border-radius: 15px;
+    padding: 60px 80px;
+    color: white;
+    width: 50%
 }
 .topItems{
     display: flex;
@@ -12,6 +16,23 @@
 }
 .musicContainer{
     width: 100%;
+}
+.playAnimation{
+    animation: ease 0.4s fadeOut;
+    animation: ease 0.4s fadeIn 
+}
+.bottomButtons{
+    display: flex;
+    margin-top:20px;
+    align-items: center;
+    justify-content: center;
+}
+.availableDevices{
+    margin-right: 10px;
+}
+.roomSettings{
+    margin-left: 10px;
+
 }
 .musicPlayer{
     display: flex;
@@ -42,3 +63,49 @@
 .audioController{
     bottom:0px;
 }
+
+.popUp{
+    z-index: 2;
+    display: flex;
+    position: fixed;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(34, 34, 34, 0.63);
+    height: 100%;
+    width: 100%;
+    top:auto;
+    bottom: auto;
+}
+.popUpContent{
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    background-color: rgba(61, 140, 204, 0.863);
+    padding: 55px 80px;
+    border-radius: 15px;
+    -webkit-box-shadow: -6px -1px 19px 5px rgba(0,255,219,0.42); 
+    box-shadow: -6px -1px 19px 5px rgba(0,255,219,0.42);
+}
+.updateRoomButton{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top:15px
+}
+
+@keyframes fadeIn{
+    0%{opacity: 0%;}
+    25%{opacity: 25%;}
+    50%{opacity: 50%;}
+    75%{opacity: 75%;}
+    100%{opacity: 100%;}
+}
+@keyframes fadeOut{
+    0%{opacity: 100%;}
+    25%{opacity: 75%;}
+    50%{opacity: 50%;}
+    75%{opacity: 25%;}
+    100%{opacity: 0%;}
+}
+

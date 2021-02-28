@@ -1,16 +1,29 @@
-import React from 'react'
+import { useState, useEffect } from 'react'
 import { Button, LinearProgress } from '@material-ui/core'
 import { Pause, PlayArrow, SkipNext } from '@material-ui/icons'
-import propTypes from 'prop-types'
 
 
-const MusicPlayer = ({ currentSong,playSong,pauseSong }) => {
+const MusicPlayer = ({ currentSong, playSong, pauseSong, skipSong, roomInfo }) => {
+    const [isPlaying, setIsPlaying] = useState(true)
+    const playOrPause = async () => {
+        isPlaying ? pauseSong() : playSong();
+        setIsPlaying(!isPlaying)
+    }
+
+    const styles = {
+        playPause: {
+            color: (roomInfo.usersCanPlayPause || roomInfo.isHost) ? 'white' : 'grey'
+        },
+        skip: {
+            color: (roomInfo.usersCanSkip || roomInfo.isHost) ? 'white' : 'grey'
+        }
+    }
     return (
         <>
-            {currentSong !== '' &&
+            {currentSong != null &&
                 <div className="musicPlayer">
                     <div className="image">
-                        {currentSong !== '' && <img src={currentSong.item.album.images[1].url} height="200" width="200"></img>}
+                        <img src={currentSong.item.album.images[1].url} height="200" width="200" alt="none" placeholder="img"></img>
                     </div>
                     <div className="rightHalf">
                         <div className="songInfo">
@@ -24,10 +37,10 @@ const MusicPlayer = ({ currentSong,playSong,pauseSong }) => {
                         <div className="audioController">
                             <div className='trackButtons'>
                                 <div className="pauseOrPlay">
-                                    <Button onClick={() => currentSong.is_playing ? pauseSong() : playSong()} startIcon={currentSong.is_playing ? <Pause /> : <PlayArrow />} />
+                                    <Button disabled={!(roomInfo.usersCanPlayPause || roomInfo.isHost)} onClick={playOrPause} startIcon={isPlaying ? <Pause style={styles.playPause} /> : <PlayArrow style={styles.playPause} />} />
                                 </div>
                                 <div className="skip">
-                                    <Button startIcon={<SkipNext />} />
+                                    <Button disabled={!(roomInfo.usersCanSkip || roomInfo.isHost)} startIcon={<SkipNext style={styles.skip} />} onClick={() => { skipSong(); setIsPlaying(true) }} />
                                 </div>
                             </div>
                             <div className="trackProgress">
@@ -40,5 +53,4 @@ const MusicPlayer = ({ currentSong,playSong,pauseSong }) => {
         </>
     )
 }
-
 export default MusicPlayer

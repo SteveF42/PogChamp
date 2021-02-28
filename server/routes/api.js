@@ -16,6 +16,7 @@ router.post('/createRoom', async (req, res) => {
                 host: req.session.id,
                 votesToSkip: req.body.votesToSkip,
                 usersCanQueue: req.body.usersCanQueue,
+                usersCanPlayPause: req.body.usersCanPlayPause,
                 usersCanSkip: req.body.usersCanSkip,
                 expireAt: date
             })
@@ -27,10 +28,11 @@ router.post('/createRoom', async (req, res) => {
         } else {
             if (req.body.override == true) {
                 RoomFound.code = randomCode.generate(5).toUpperCase()
-                RoomFound.host = req.session.id,
+                RoomFound.host = req.session.id
                 RoomFound.votesToSkip = req.body.votesToSkip
                 RoomFound.usersCanQueue = req.body.usersCanQueue
-                RoomFound.usersCanSkip =req.body.usersCanSkip
+                RoomFound.usersCanPlayPause = req.body.usersCanPlayPause
+                RoomFound.usersCanSkip = req.body.usersCanSkip
                 RoomFound.expireAt = date
                 const savedRoom = await RoomFound.save()
                 res.status(201).json({ Room: savedRoom })
@@ -42,6 +44,25 @@ router.post('/createRoom', async (req, res) => {
         res.status(500).json({ error: err })
         console.log(err)
     }
+
+})
+
+//only host can update the room
+router.post('/updateRoom', async(req,res)=>{
+    console.log(req.body)
+    try{
+        const room = await Rooms.findOne({host:req.sessionID})
+        // room.votesToSkip = req.body.votesToSkip
+        room.usersCanQueue = req.body.usersCanQueue
+        room.usersCanPlayPause = req.body.usersCanPlayPause
+        room.usersCanSkip = req.body.usersCanSkip
+        
+        room.save()
+        res.status(202).json({message:'accepted'})
+    }catch(err){
+        res.status(501).json({message:err})
+    }
+    
 
 })
 
@@ -62,7 +83,21 @@ router.get('/createRoom', async (req, res) => {
     }
 })
 
-router.get('/:id', (req, res) => {
-
+router.get('/getRoom/:code', async(req, res) => {
+    const code = req.params.code
+    const room = await Rooms.findOne({code:code})
+    if(room == null){
+        res.status(404).json({message:'Not Found'})
+        return
+    }
+    
+    const response = {
+        isHost: req.sessionID === room.host,
+        code: room.code,
+        usersCanQueue: room.usersCanQueue,
+        usersCanSkip: room.usersCanSkip,
+        usersCanPlayPause:room.usersCanPlayPause
+    }
+    res.status(200).json({roomInfo:response})
 })
 module.exports = router

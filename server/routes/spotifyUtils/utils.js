@@ -84,15 +84,31 @@ const getTokens = async (sessionID) => {
     return token
 }
 
-const callSpotifyApi = async (endpoint, hostSession, method) => {
+const callSpotifyApi = async (endpoint, hostSession, method,body={}) => {
     const token = await Tokens.findOne({ user: hostSession })
     const url = 'https://api.spotify.com/v1/' + endpoint
-    const response = await fetch(url, {
-        method: method,
-        headers: {
-            Authorization: 'Bearer ' + token.access_token
-        },
-    })
+
+    let response
+    if(method==='GET'){
+        response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                Authorization: 'Bearer ' + token.access_token,
+                'Content-Type':'application/json'
+            },
+            
+        })
+    }else{
+        response = await fetch(url, {
+            method: method,
+            headers: {
+                Authorization: 'Bearer ' + token.access_token,
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify(body)
+    
+        })
+    }
 
     return response
 }

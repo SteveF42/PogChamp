@@ -7,10 +7,10 @@ const Footer = () => {
             <div className="footer-info">
                 <a href='/'> Terms of use </a>
                 <a href='/'> Privacy Policy </a>
-                <a href='/'> GitHub </a>
+                <a href='https://github.com/SteveF42/PogChamp'> GitHub </a>
             </div>
             <span>
-                <p>Spotify is copyright Spotify AB and is not affiliated with Pogify</p>
+                <p>Spotify is copyright Spotify AB and is not affiliated with PogChamp</p>
             </span>
         </footer>
     )

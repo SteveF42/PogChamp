@@ -57,12 +57,42 @@ router.get('/isAuthenticated',async (req,res)=>{
 router.put('/play',async (req,res)=>{
     const apiEndPoint = 'me/player/play'
     const room = await Rooms.findOne({code:req.body.code})
+    const param = req.body.deviceID !== undefined ? `?device_id=${req.body.deviceID}` : null
+    const body = {
+        position_ms: req.body.position_ms,
+        context_uri: req.body.context_uri,
+    }
 
     if(room == null) {res.status(404); return}
 
     const host = room.host
+    if(req.sessionID===host){
+        await isAuthenticated(req.sessionID)
+    }
+
     if(req.sessionID === host || room.usersCanPlayPause){
-        callSpotifyApi(apiEndPoint,host,'PUT')
+        callSpotifyApi(apiEndPoint,host,'PUT',)
+    }
+    res.status(200).json({message:'success'})
+
+})
+
+router.put('/playNewDevice',async(req,res) => {
+    const apiEndPoint = 'me/player'
+    const room = await Rooms.findOne({host:req.sessionID})
+    const body = {
+        device_ids:[req.body.deviceID],
+        play:true
+    }
+
+    if(room == null) {res.status(404); return}
+
+    const host = room.host
+    if(req.sessionID===host){
+        await isAuthenticated(req.sessionID)
+    }
+    if(req.sessionID === host || room.usersCanPlayPause){
+        callSpotifyApi(apiEndPoint,req.sessionID,'PUT',body)
     }
     res.status(200).json({message:'success'})
 
@@ -74,8 +104,26 @@ router.put('/pause',async (req,res) => {
     if(room == null){res.status(404);return}
 
     const host = room.host
+    if(req.sessionID===host){
+        await isAuthenticated(req.sessionID)
+    }
     if(req.sessionID === host || room.usersCanPlayPause){
-        callSpotifyApi(apiEndPoint,host,'PUT')
+        await callSpotifyApi(apiEndPoint,host,'PUT')
+    }
+    res.status(200).json({message:'success'})
+})
+
+router.post('/skip',async (req,res) => {
+    const apiEndPoint = 'me/player/next'
+    const room = await Rooms.findOne({code:req.body.code})
+    if(room == null){res.status(404);return}
+
+    const host = room.host
+    if(req.sessionID===host){
+        await isAuthenticated(req.sessionID)
+    }
+    if(req.sessionID === host || room.usersCanSkip){
+        callSpotifyApi(apiEndPoint,host,'POST')
     }
     res.status(200).json({message:'success'})
 })
@@ -98,7 +146,7 @@ router.post('/refreshTokens', async (req,res) => {
 router.post('/currentlyPlaying', async (req,res) => {
     const apiEndPoint = 'me/player/currently-playing'
     const room = await Rooms.findOne({code:req.body.code})
-    if(room == null){res.status(404);return}
+    if(room == null){res.status(404).json({message:'not found'});return}
 
     const host = room.host
     const response = await callSpotifyApi(apiEndPoint,host,'GET')
@@ -109,6 +157,26 @@ router.post('/currentlyPlaying', async (req,res) => {
     }catch(err){
         res.status(204).json({song:err})
     }
+})
+
+router.get('/getAvailableDevices',async(req,res)=>{
+    const apiEndPoint = 'me/player/devices'
+    const room = await Rooms.findOne({host:req.sessionID})
+
+    if(room === null){
+        res.status(404).json({message:'not found'})
+        return
+    }
+
+    try{
+        const response = await callSpotifyApi(apiEndPoint,req.sessionID,'GET')
+        const data = await response.json()
+        res.status(200).json({devices:data.devices})
+    }catch(err){
+        res.status(501).json({message:err})
+    }
+        
+    
 })
 
 module.exports = router

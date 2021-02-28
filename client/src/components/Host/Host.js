@@ -92,8 +92,8 @@ const Host = () => {
             const data = {
                 votesToSkip: votesToSkip,
                 usersCanQueue: allowQueue,
-                usersCanSkip: allowSkip,
                 usersCanPlayPause: allowPlayPause,
+                usersCanSkip: allowSkip,
                 override: session != null
             }
 
