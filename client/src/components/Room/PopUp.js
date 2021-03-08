@@ -1,7 +1,7 @@
 import {useState} from 'react'
 import {Checkbox,FormControlLabel,withStyles} from '@material-ui/core'
 import {green} from '@material-ui/core/colors'
-import {BlueButton} from '../Buttons'
+import {GreenButton} from '../Buttons'
 
 const CustomCheckBox = withStyles({
     root: {
@@ -17,7 +17,7 @@ const PopUp = ({usersCanSkip,usersCanQueue,usersCanPlayPause,hidePopUp}) => {
 
     const onClick= async(e) => {
         //update the room info
-        const response = await fetch('/api/updateRoom',{
+        await fetch('/api/updateRoom',{
             method:'POST',
             headers:{
                 'Content-Type': 'application/json'
@@ -25,7 +25,8 @@ const PopUp = ({usersCanSkip,usersCanQueue,usersCanPlayPause,hidePopUp}) => {
             body: JSON.stringify({
                 usersCanPlayPause:canPlayPause,
                 usersCanQueue:canQueue,
-                usersCanSkip:canSkip
+                usersCanSkip:canSkip,
+                updatePermissions:true
             })
         })
         hidePopUp(e)
@@ -39,7 +40,7 @@ const PopUp = ({usersCanSkip,usersCanQueue,usersCanPlayPause,hidePopUp}) => {
             <FormControlLabel control={<CustomCheckBox color="default" checked={canSkip}  onChange={()=>setCanSkip(!canSkip)}/>} label="Allow users to skip"/>
             <FormControlLabel control={<CustomCheckBox color="default" checked={canQueue} onChange={()=>setCanQueue(!canQueue)}/>} label="Allow users to queue music"/>
             <div className="updateRoomButton">
-                <BlueButton className="roomUpdate" onClick={onClick}>Update Room</BlueButton>
+                <GreenButton className="roomUpdate" onClick={onClick}>Update Room</GreenButton>
             </div>
             </div>
         </div>

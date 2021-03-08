@@ -3,7 +3,9 @@
     border-radius: 15px;
     padding: 60px 80px;
     color: white;
-    width: 50%
+    width: 50%;
+    -webkit-box-shadow: 11px 15px 19px 14px rgba(107,255,219,0.63), -9px -6px 19px 14px rgba(138,229,255,0.63), -9px -6px 19px 14px rgba(138,229,255,0.63); 
+    box-shadow: 11px 15px 19px 14px rgba(107,255,219,0.63), -9px -6px 19px 14px rgba(138,229,255,0.63), -9px -6px 19px 14px rgba(138,229,255,0.63);
 }
 .topItems{
     display: flex;
@@ -16,6 +18,7 @@
 }
 .musicContainer{
     width: 100%;
+
 }
 .playAnimation{
     animation: ease 0.4s fadeOut;
@@ -37,7 +40,11 @@
 .musicPlayer{
     display: flex;
     flex-direction: row;
+    border:solid rgb(65, 65, 65) 2px;
     width: 100%;
+}
+.leftHalf{
+    border-right: none;
 }
 .rightHalf{
     width: 80%;
@@ -46,6 +53,7 @@
     text-align: center;
     bottom:0px;
     justify-content: space-between;
+    border-left: none;
 }
 .artists{
     margin: 0;
@@ -92,6 +100,46 @@
     justify-content: center;
     align-items: center;
     margin-top:15px
+}
+.searchInput{
+    display: flex;
+    justify-content: space-between;
+}
+.song{
+    display: flex;
+    justify-content: space-evenly;
+    margin: 25px 0;
+    text-align: center;
+}
+.song_leftSide{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center
+}
+/* .song_btnGroup{
+    display: flex;
+    flex-direction: row;
+} */
+.songDetails p{
+    padding: 5px 0;
+}
+.songDetails{
+    width: 100%;
+    display: flex;
+}
+.songLength{
+    display: flex;
+}
+.songName{
+    display: flex;
+}
+.songDetails div{
+    display: flex;
+    flex-direction: column;
+    width: 35%;
+}
+.songDetails div p{
+    margin:0
 }
 
 @keyframes fadeIn{

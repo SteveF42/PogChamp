@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button, LinearProgress } from '@material-ui/core'
 import { Pause, PlayArrow, SkipNext } from '@material-ui/icons'
 
 
 const MusicPlayer = ({ currentSong, playSong, pauseSong, skipSong, roomInfo }) => {
-    const [isPlaying, setIsPlaying] = useState(true)
+    const [isPlaying, setIsPlaying] = useState(currentSong===undefined? false:currentSong.is_playing)
     const playOrPause = async () => {
         isPlaying ? pauseSong() : playSong();
         setIsPlaying(!isPlaying)
@@ -20,9 +20,9 @@ const MusicPlayer = ({ currentSong, playSong, pauseSong, skipSong, roomInfo }) =
     }
     return (
         <>
-            {currentSong != null &&
+            {currentSong !== undefined &&
                 <div className="musicPlayer">
-                    <div className="image">
+                    <div className="leftHalf">
                         <img src={currentSong.item.album.images[1].url} height="200" width="200" alt="none" placeholder="img"></img>
                     </div>
                     <div className="rightHalf">

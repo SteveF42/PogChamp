@@ -25,7 +25,7 @@ export const FadeMenu = ({ menuItems, label, startPlaybackOnDevice}) => {
                 onClose={handleClose}
                 TransitionComponent={Fade}
             >
-            {menuItems.map(obj => <MenuItem id={obj.id} key={obj.id} onClick={handleClose}>{obj.name}</MenuItem>)}
+            {menuItems!==undefined && menuItems.map(obj => <MenuItem id={obj.id} key={obj.id} onClick={handleClose}>{obj.name}</MenuItem>)}
             </Menu>
         </>
     );

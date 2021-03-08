@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
-import './Room.css'
 import { Switch, FormControlLabel } from '@material-ui/core'
+import { FadeMenu, BlueButton } from '../Buttons'
 import MusicPlayer from './MusicPlayer'
 import PopUp from './PopUp'
-import { FadeMenu, BlueButton } from '../Buttons'
+import QueueView from './QueueView'
+import {pauseSong,playSong,skipSong} from './utils'
+import './Room.css'
 
 const Room = () => {
     const code = window.localStorage.getItem('code') || window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1)
@@ -15,7 +17,7 @@ const Room = () => {
 
     //when component mounts, it sets a timer to poll with the server
     useEffect(() => {
-
+        window.localStorage.setItem('code',code)
         getCurrentSong()
         getRoomInfo().then((roomInfo) => {
             if (roomInfo.isHost) {
@@ -29,22 +31,18 @@ const Room = () => {
         const timerID = setInterval(() => {
             getCurrentSong()
             getRoomInfo()
+            // if(roomInfo.isHost){
+            //     fetch('/spotify/isAuthenticated')
+            // }
         }, 5000)
 
         return () => {
             clearInterval(timerID)
+            //if the host leaves then clean up the queue
+            fetch('/api/clearQueue',{method:'PUT'})
         }
         // eslint-disable-next-line
     }, [])
-
-    //logs the currentSong which causes a page reload
-    useEffect(() => {
-        // console.log(currentSong)
-        // console.log(roomInfo)
-        // console.log(availableDevices);
-        // console.log(currentSong.item.album.images[0].url)
-    }, [currentSong, roomInfo, availableDevices])
-
 
     const getAvailableDevices = async () => {
         const res = await fetch(`/spotify/getAvailableDevices`)
@@ -93,61 +91,10 @@ const Room = () => {
         }
     }
 
-    //pauses the song
-    const pauseSong = async () => {
-        console.log('pause')
 
-        const res = await fetch('/spotify/pause', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                code: code
-            })
-        })
-        if (res.status !== 200) {
-            console.log(res)
-        }
-    }
-
-    //resumes playback
-    const playSong = async () => {
-        console.log('play')
-
-        const res = await fetch('/spotify/play', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                code: code,
-            })
-        })
-        if (res.status !== 200) {
-            console.log(res)
-        }
-    }
-
-    const skipSong = async () => {
-        console.log('skip')
-
-        const res = await fetch('/spotify/skip', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                code: code
-            })
-        })
-        if (res.status !== 200) {
-            console.log(res)
-        }
-    }
     const playAnimation = () => {
         const elements = document.getElementsByClassName('attachAnimation')
-        for(let item of elements){
+        for (let item of elements) {
             item.classList.remove('playAnimation')
             void item.offsetWidth
             item.classList.add('playAnimation')
@@ -171,20 +118,20 @@ const Room = () => {
         })
         console.log(res);
         if (currentSong == null || currentSong.is_playing === false) {
-            playSong()
+            playSong(code)
             getCurrentSong()
         }
     }
     const hidePopUp = (e) => {
         const className = e.target.className
-        if(className === 'popUp'|| className==='MuiButton-label'){
+        if (className === 'popUp' || className === 'MuiButton-label') {
             setDisplayPopUp(!displayPopUp)
         }
     }
 
     return (
         <>
-            {displayPopUp && <PopUp hidePopUp={hidePopUp} usersCanPlayPause={roomInfo.usersCanPlayPause} usersCanQueue={roomInfo.usersCanQueue} usersCanSkip={roomInfo.usersCanSkip}/>}
+            {displayPopUp && <PopUp hidePopUp={hidePopUp} usersCanPlayPause={roomInfo.usersCanPlayPause} usersCanQueue={roomInfo.usersCanQueue} usersCanSkip={roomInfo.usersCanSkip} />}
             <div className="roomContainer">
 
                 <div className="topHalf">
@@ -194,7 +141,7 @@ const Room = () => {
                         </span>
                         <div className="queueSwitch">
                             <FormControlLabel
-                            labelPlacement="top"
+                                labelPlacement="top"
                                 control={
                                     <Switch
                                         size='medium'
@@ -205,7 +152,7 @@ const Room = () => {
                                         }}
                                     />
                                 }
-                                label={<p className="attachAnimation" style={{margin:'0'}}> {view ? 'Track' :'Music'}</p>}
+                                label={<p className="attachAnimation" style={{ margin: '0' }}> {view ? 'Queue' : 'Music'}</p>}
                             />
                         </div>
                     </div>
@@ -213,14 +160,13 @@ const Room = () => {
                     <div className="attachAnimation musicContainer">
                         {/* switches between the music view or the queue view */}
                         {!view ?
-                            <MusicPlayer roomInfo={roomInfo} currentSong={currentSong} pauseSong={pauseSong} playSong={playSong} skipSong={skipSong} />
+                            <MusicPlayer roomInfo={roomInfo} currentSong={currentSong} pauseSong={()=>pauseSong(code)} playSong={()=>playSong(code)} skipSong={()=>skipSong(code)} />
                             :
-                            <p>Other</p>
+                            <QueueView Queue={roomInfo.songQueue} code={code}/>
                         }
                         {!view &&
                             <div className="bottomButtons">
-                                {currentSong !== null &&
-                                    (availableDevices !== undefined && roomInfo.isHost) &&
+                                {(availableDevices !== undefined && roomInfo.isHost) &&
                                     <div className="availableDevices">
                                         <FadeMenu menuItems={availableDevices.devices} label="Listening Device" startPlaybackOnDevice={startPlaybackOnDevice}></FadeMenu>
                                     </div>

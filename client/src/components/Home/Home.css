@@ -3,6 +3,8 @@
     border-radius: 15px;
     padding: 60px 80px;
     color: white;
+    -webkit-box-shadow: 11px 15px 19px 14px rgba(107,255,219,0.63), -9px -6px 19px 14px rgba(138,229,255,0.63), -9px -6px 19px 14px rgba(138,229,255,0.63); 
+    box-shadow: 11px 15px 19px 14px rgba(107,255,219,0.63), -9px -6px 19px 14px rgba(138,229,255,0.63), -9px -6px 19px 14px rgba(138,229,255,0.63);
 }
 .header-home{
     display: flex;
