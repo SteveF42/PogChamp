@@ -113,4 +113,16 @@ const callSpotifyApi = async (endpoint, hostSession, method,body={}) => {
     return response
 }
 
-module.exports = { refreshTokens, isAuthenticated, updateOrCreateTokens, callSpotifyApi }
+const updateSongQueue = async (room,hostSession)=>{
+    if(room.songQueue.length === 0) return;
+
+    let songResponse = await callSpotifyApi('me/player/currently-playing',hostSession,'GET')
+    let songData = await songResponse.json()
+    //if the current song is the first on in the queue then we gotta pop it from the queue
+    if(songData.item.name === room.songQueue[0].songName){
+        room.songQueue.shift()
+        room.save();
+    }
+}
+
+module.exports = { refreshTokens, isAuthenticated, updateOrCreateTokens, callSpotifyApi,updateSongQueue }

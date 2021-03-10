@@ -137,7 +137,7 @@ const Room = () => {
                 <div className="topHalf">
                     <div className="topItems">
                         <span className="roomCode">
-                            <h3>Code: {window.localStorage.getItem('code')}</h3>
+                            <h3 style={{fontSize:"1.58rem"}}>Code: {window.localStorage.getItem('code')}</h3>
                         </span>
                         <div className="queueSwitch">
                             <FormControlLabel

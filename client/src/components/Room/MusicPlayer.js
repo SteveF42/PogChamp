@@ -5,6 +5,8 @@ import { Pause, PlayArrow, SkipNext } from '@material-ui/icons'
 
 const MusicPlayer = ({ currentSong, playSong, pauseSong, skipSong, roomInfo }) => {
     const [isPlaying, setIsPlaying] = useState(currentSong===undefined? false:currentSong.is_playing)
+    const [voted,setVoted] = useState(false)
+    const [roomVotes,setRoomVotes] = useState(roomInfo.votesToSkip)
     const playOrPause = async () => {
         isPlaying ? pauseSong() : playSong();
         setIsPlaying(!isPlaying)
@@ -40,6 +42,7 @@ const MusicPlayer = ({ currentSong, playSong, pauseSong, skipSong, roomInfo }) =
                                     <Button disabled={!(roomInfo.usersCanPlayPause || roomInfo.isHost)} onClick={playOrPause} startIcon={isPlaying ? <Pause style={styles.playPause} /> : <PlayArrow style={styles.playPause} />} />
                                 </div>
                                 <div className="skip">
+                                    <p></p>
                                     <Button disabled={!(roomInfo.usersCanSkip || roomInfo.isHost)} startIcon={<SkipNext style={styles.skip} />} onClick={() => { skipSong(); setIsPlaying(true) }} />
                                 </div>
                             </div>

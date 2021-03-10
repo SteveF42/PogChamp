@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const fetch = require('node-fetch')
-const {isAuthenticated,refreshTokens,updateOrCreateTokens,callSpotifyApi} = require('./spotifyUtils/utils')
+const {isAuthenticated,refreshTokens,updateOrCreateTokens,callSpotifyApi,updateSongQueue} = require('./spotifyUtils/utils')
 const Rooms = require('../database/Models/room')
 const Tokens = require('../database/Models/tokens')
 const querystring = require('querystring')
@@ -57,12 +57,12 @@ router.get('/isAuthenticated',async (req,res)=>{
 router.put('/play',async (req,res)=>{
     const apiEndPoint = 'me/player/play'
     const room = await Rooms.findOne({code:req.body.code})
-    const param = req.body.deviceID !== undefined ? `?device_id=${req.body.deviceID}` : null
-    const body = {
-        position_ms: req.body.position_ms,
+    const body = req.body.context_uri==='' ? {} : {
+        offset: req.body.offset,
         context_uri: req.body.context_uri,
     }
-
+    
+    console.log(body)
     if(room == null) {res.status(404); return}
 
     const host = room.host
@@ -71,7 +71,7 @@ router.put('/play',async (req,res)=>{
     }
 
     if(req.sessionID === host || room.usersCanPlayPause){
-        callSpotifyApi(apiEndPoint,host,'PUT',)
+        callSpotifyApi(apiEndPoint,host,'PUT',body)
     }
     res.status(200).json({message:'success'})
 
@@ -124,7 +124,8 @@ router.post('/skip',async (req,res) => {
     }
     if(req.sessionID === host || room.usersCanSkip){
         callSpotifyApi(apiEndPoint,host,'POST')
-    }
+        updateSongQueue(room,host)
+    }   
     res.status(200).json({message:'success'})
 })
 
@@ -150,6 +151,7 @@ router.post('/currentlyPlaying', async (req,res) => {
 
     const host = room.host
     const response = await callSpotifyApi(apiEndPoint,host,'GET')
+    updateSongQueue(room,host)
     
     try{
         const json = await response.json()
@@ -175,8 +177,68 @@ router.get('/getAvailableDevices',async(req,res)=>{
     }catch(err){
         res.status(501).json({message:err})
     }
-        
     
 })
 
+router.post('/searchSpotify',async(req,res)=>{
+    const q = req.body.query.split(' ').join('%20')
+    const type= req.body.type.split(' ').join('%2C')
+    const code = req.body.code
+
+    const room = await Rooms.findOne({code:code})
+    const host = room.host
+    if(req.sessionID===host){
+       await isAuthenticated(req.sessionID)
+    }
+
+    const tokens = await Tokens.findOne({user:host})
+    const url =`https://api.spotify.com/v1/search?q=${q}&type=${type}`
+    console.log(url)
+
+    try{
+
+        const response = await fetch(url,{
+            headers:{
+                Authorization:'Bearer ' + tokens.access_token,
+                'Content-Type':'application/json',
+                'Accept':'application/json' 
+            }
+        })
+        const data = await response.json()
+        res.status(200).json(data)
+    }catch(err){
+        res.status(501).json({message:err})
+    }
+        
+})
+
+router.post('/addToQueue', async (req,res)=>{
+    const code = req.body.code
+    const uri = req.body.uri
+
+    const room = await Rooms.findOne({code:code})
+    const host = room.host
+    if(req.sessionID===host){
+       await isAuthenticated(req.sessionID)
+    }
+
+    const tokens = await Tokens.findOne({user:host})
+    const url =`https://api.spotify.com/v1/me/player/queue?uri=${uri}`
+
+    try{
+
+        const response = await fetch(url,{
+            method:'POST',
+            headers:{
+                Authorization:'Bearer ' + tokens.access_token,
+                'Content-Type':'application/json',
+                'Accept':'application/json' 
+            }
+        })
+        res.status(200).json({message:'success'})
+    }catch(err){
+        res.status(501).json({message:err})
+    }
+       
+})
 module.exports = router
