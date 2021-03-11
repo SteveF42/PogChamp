@@ -34,7 +34,7 @@ const Room = () => {
             // if(roomInfo.isHost){
             //     fetch('/spotify/isAuthenticated')
             // }
-        }, 5000)
+        }, 2500)
 
         return () => {
             clearInterval(timerID)
@@ -131,7 +131,7 @@ const Room = () => {
 
     return (
         <>
-            {displayPopUp && <PopUp hidePopUp={hidePopUp} usersCanPlayPause={roomInfo.usersCanPlayPause} usersCanQueue={roomInfo.usersCanQueue} usersCanSkip={roomInfo.usersCanSkip} />}
+            {displayPopUp && <PopUp hidePopUp={hidePopUp} usersCanPlayPause={roomInfo.usersCanPlayPause} usersCanQueue={roomInfo.usersCanQueue} usersCanSkip={roomInfo.usersCanSkip} votesToSkip={roomInfo.votesToSkip}/>}
             <div className="roomContainer">
 
                 <div className="topHalf">
@@ -160,7 +160,7 @@ const Room = () => {
                     <div className="attachAnimation musicContainer">
                         {/* switches between the music view or the queue view */}
                         {!view ?
-                            <MusicPlayer roomInfo={roomInfo} currentSong={currentSong} pauseSong={()=>pauseSong(code)} playSong={()=>playSong(code)} skipSong={()=>skipSong(code)} />
+                            <MusicPlayer roomInfo={roomInfo} currentSong={currentSong} pauseSong={()=>pauseSong(code)} playSong={()=>playSong(code)} skipSong={skipSong} />
                             :
                             <QueueView Queue={roomInfo.songQueue} code={code}/>
                         }

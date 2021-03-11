@@ -6,7 +6,8 @@ require('mongoose-type-url')
 const RoomSchema = new mongoose.Schema({
     code: {type:String, unique : true, required : true},
     host: {type:String, unique : true, required : true},
-    votesToSkip: {type: Number, default:0, required:true},
+    currentVotes:{type:Number, required: true, defualt: 0},
+    votesToSkip: {type:Number, required:true, defualt: 0},
     usersCanQueue: {type:Boolean, required:true, defualt: false},
     usersCanSkip: {type:Boolean, required:true,default: false},
     usersCanPlayPause:{type:Boolean, required:true, default: false},

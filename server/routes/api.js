@@ -20,7 +20,8 @@ router.post('/createRoom', async (req, res) => {
                 usersCanPlayPause: req.body.usersCanPlayPause,
                 usersCanSkip: req.body.usersCanSkip,
                 expireAt: date,
-                songQueue:[]
+                songQueue:[],
+                currentVotes: 0
             })
             const savedRoom = await newRoom.save()
             res.status(201).json({ Room: savedRoom })
@@ -36,7 +37,8 @@ router.post('/createRoom', async (req, res) => {
                 RoomFound.usersCanPlayPause = req.body.usersCanPlayPause
                 RoomFound.usersCanSkip = req.body.usersCanSkip
                 RoomFound.expireAt = date
-                RoomFound.songQueue= []
+                RoomFound.songQueue = []
+                RoomFound.currentVotes = 0;
                 const savedRoom = await RoomFound.save()
                 res.status(201).json({ Room: savedRoom })
             } else {
@@ -81,7 +83,9 @@ router.get('/getRoom/:code', async(req, res) => {
         usersCanQueue: room.usersCanQueue,
         usersCanSkip: room.usersCanSkip,
         usersCanPlayPause:room.usersCanPlayPause,
-        songQueue: room.songQueue
+        songQueue: room.songQueue,
+        currentVotes: room.currentVotes,
+        votesToSkip: room.votesToSkip
     }
     res.status(200).json({roomInfo:response})
 })
@@ -93,7 +97,7 @@ router.post('/updateRoom', async(req,res)=>{
 
         try{
             const room = await Rooms.findOne({host:req.sessionID})
-            // room.votesToSkip = req.body.votesToSkip
+            room.votesToSkip = req.body.votesToSkip
             room.usersCanQueue = req.body.usersCanQueue
             room.usersCanPlayPause = req.body.usersCanPlayPause
             room.usersCanSkip = req.body.usersCanSkip

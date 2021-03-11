@@ -1,17 +1,15 @@
-import { useState } from 'react'
+import { useState,useEffect } from 'react'
 import { Button, LinearProgress } from '@material-ui/core'
 import { Pause, PlayArrow, SkipNext } from '@material-ui/icons'
 
 
 const MusicPlayer = ({ currentSong, playSong, pauseSong, skipSong, roomInfo }) => {
-    const [isPlaying, setIsPlaying] = useState(currentSong===undefined? false:currentSong.is_playing)
-    const [voted,setVoted] = useState(false)
-    const [roomVotes,setRoomVotes] = useState(roomInfo.votesToSkip)
+    const [isPlaying, setIsPlaying] = useState(currentSong === undefined ? false : currentSong.is_playing)
+    const [voted, setVoted] = useState(false)
     const playOrPause = async () => {
         isPlaying ? pauseSong() : playSong();
         setIsPlaying(!isPlaying)
     }
-
     const styles = {
         playPause: {
             color: (roomInfo.usersCanPlayPause || roomInfo.isHost) ? 'white' : 'grey'
@@ -43,7 +41,12 @@ const MusicPlayer = ({ currentSong, playSong, pauseSong, skipSong, roomInfo }) =
                                 </div>
                                 <div className="skip">
                                     <p></p>
-                                    <Button disabled={!(roomInfo.usersCanSkip || roomInfo.isHost)} startIcon={<SkipNext style={styles.skip} />} onClick={() => { skipSong(); setIsPlaying(true) }} />
+                                    <Button style={{ color: 'white' }} disabled={!(roomInfo.usersCanSkip || roomInfo.isHost)} startIcon={<SkipNext style={styles.skip} />}
+                                        onClick={() => {
+                                            skipSong(window.localStorage.getItem('code'), voted); setIsPlaying(true); setVoted(!voted);
+                                        }}>
+                                        {roomInfo.currentVotes} / {roomInfo.votesToSkip}
+                                    </Button>
                                 </div>
                             </div>
                             <div className="trackProgress">

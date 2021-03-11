@@ -19,7 +19,6 @@ const QueueView = ({ Queue, code }) => {
         }
 
         // eslint-disable-next-line
-
     }, [Queue])
 
 

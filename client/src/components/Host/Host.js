@@ -90,7 +90,7 @@ const Host = () => {
         } else {
         //if not then just create a room and send them to it
             const data = {
-                votesToSkip: votesToSkip,
+                votesToSkip:votesToSkip,
                 usersCanQueue: allowQueue,
                 usersCanPlayPause: allowPlayPause,
                 usersCanSkip: allowSkip,

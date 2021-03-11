@@ -29,7 +29,7 @@ app.use(session({
     secret: process.env.SECRET_KEY,
     store: new MongoStore({
         mongooseConnection: mongoose.connection,
-        ttl: 30 * 24 * 60 * 60, //30 days
+        ttl: 1 * 24 * 60 * 60, //30 days
     }),
     resave: false,
     saveUninitialized: true,

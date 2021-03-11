@@ -62,9 +62,8 @@ router.put('/play',async (req,res)=>{
         context_uri: req.body.context_uri,
     }
     
-    console.log(body)
     if(room == null) {res.status(404); return}
-
+    
     const host = room.host
     if(req.sessionID===host){
         await isAuthenticated(req.sessionID)
@@ -72,6 +71,9 @@ router.put('/play',async (req,res)=>{
 
     if(req.sessionID === host || room.usersCanPlayPause){
         callSpotifyApi(apiEndPoint,host,'PUT',body)
+    }else{
+        res.status(401).json({message:'unauthorized'})
+        return;
     }
     res.status(200).json({message:'success'})
 
@@ -117,15 +119,31 @@ router.post('/skip',async (req,res) => {
     const apiEndPoint = 'me/player/next'
     const room = await Rooms.findOne({code:req.body.code})
     if(room == null){res.status(404);return}
+    //check if the user already voted
+    //check if the required votes to skip have been met
+    //if the host skips the song reset the votes
+    //make sure the same user can't skip twice
+    if(req.session.voted===undefined || req.session.voted === false){
+        req.session.voted=true;
+        room.currentVotes++;
+    }else if(req.session.voted===true){
+        req.session.voted=false;
+        if(room.currentVotes > 0)
+            room.currentVotes--;
+    }
+
 
     const host = room.host
     if(req.sessionID===host){
         await isAuthenticated(req.sessionID)
     }
-    if(req.sessionID === host || room.usersCanSkip){
+    if(req.sessionID === host || room.currentVotes >= room.votesToSkip){
+        room.currentVotes=0;
         callSpotifyApi(apiEndPoint,host,'POST')
-        updateSongQueue(room,host)
+        updateSongQueue(req.body.code,host)
     }   
+
+    room.save();
     res.status(200).json({message:'success'})
 })
 
@@ -151,7 +169,7 @@ router.post('/currentlyPlaying', async (req,res) => {
 
     const host = room.host
     const response = await callSpotifyApi(apiEndPoint,host,'GET')
-    updateSongQueue(room,host)
+    updateSongQueue(req.body.code,host)
     
     try{
         const json = await response.json()

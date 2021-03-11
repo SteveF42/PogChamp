@@ -38,7 +38,7 @@ export const playSong = async (code,params = {context_uri:'',offset:0}) => {
     }
 }
 
-export const skipSong = async (code) => {
+export const skipSong = async (code,voted=false) => {
     console.log('skip')
 
     const res = await fetch('/spotify/skip', {
@@ -47,7 +47,8 @@ export const skipSong = async (code) => {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            code: code
+            code,
+            voted
         })
     })
     if (res.status !== 200) {
