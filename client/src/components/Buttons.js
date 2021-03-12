@@ -1,9 +1,11 @@
+import React from 'react'
 import { green, blue } from '@material-ui/core/colors'
 import { Button, Menu, MenuItem, withStyles, Fade } from '@material-ui/core'
 import { useState } from 'react'
 
 export const FadeMenu = ({ menuItems, label, startPlaybackOnDevice}) => {
     const [anchorEl, setAnchorEl] = useState(null)
+    const menu = React.createRef()
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget)
@@ -24,6 +26,7 @@ export const FadeMenu = ({ menuItems, label, startPlaybackOnDevice}) => {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
                 TransitionComponent={Fade}
+                ref={menu}
             >
             {menuItems!==undefined && menuItems.map(obj => <MenuItem id={obj.id} key={obj.id} onClick={handleClose}>{obj.name}</MenuItem>)}
             </Menu>

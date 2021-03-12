@@ -20,10 +20,7 @@
     width: 100%;
 
 }
-.playAnimation{
-    animation: ease 0.4s fadeOut;
-    animation: ease 0.4s fadeIn 
-}
+
 .bottomButtons{
     display: flex;
     margin-top:20px;
@@ -142,18 +139,44 @@
     margin:0
 }
 
+.playAnimation{
+    animation: ease 0.4s fadeIn;
+    /* animation: ease 0.4s fadeOut; */
+}
+.fade-appear{
+    opacity: 0;
+}
+.fade-appear-active{
+    opacity: 1;
+    transition: opacity 600ms linear;
+}
+.fade-enter{
+    opacity: 0;
+}
+.fade-enter-active{
+    opacity: 1;
+    transition: opacity 600ms ease-in;
+}
+.fade-exit{
+    opacity: 1;
+}
+.fade-exit-active{
+    opacity: 0;
+    transition: opacity 600ms ease-in;
+}
+
 @keyframes fadeIn{
-    0%{opacity: 0%;}
-    25%{opacity: 25%;}
-    50%{opacity: 50%;}
-    75%{opacity: 75%;}
+    0%{opacity: 0%; visibility: visible;}
+    25%{opacity: 25%; visibility: visible;}
+    50%{opacity: 50%; visibility: visible;}
+    75%{opacity: 75%; visibility: visible;}
     100%{opacity: 100%;}
 }
 @keyframes fadeOut{
-    0%{opacity: 100%;}
-    25%{opacity: 75%;}
-    50%{opacity: 50%;}
-    75%{opacity: 25%;}
-    100%{opacity: 0%;}
+    0%{opacity: 100%; visibility: visible;}
+    25%{opacity: 75%; visibility: visible;}
+    50%{opacity: 50%; visibility: visible;}
+    75%{opacity: 25%; visibility: visible;}
+    100%{opacity: 0%; visibility: visible;}
 }
 

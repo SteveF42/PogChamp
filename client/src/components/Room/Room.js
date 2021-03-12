@@ -1,23 +1,36 @@
+import { useMeasure } from 'react-use'
 import { useEffect, useState } from 'react'
+import React from 'react'
 import { Switch, FormControlLabel } from '@material-ui/core'
 import { FadeMenu, BlueButton } from '../Buttons'
+import { Transition } from 'react-spring/renderprops'
+import { useSpring, animated } from 'react-spring'
 import MusicPlayer from './MusicPlayer'
 import PopUp from './PopUp'
 import QueueView from './QueueView'
-import {pauseSong,playSong,skipSong} from './utils'
+import { pauseSong, playSong, skipSong } from './utils'
 import './Room.css'
 
 const Room = () => {
     const code = window.localStorage.getItem('code') || window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1)
     const [availableDevices, setAvailableDevices] = useState()
+    const [animation, setAnimation] = useState(true)
     const [displayPopUp, setDisplayPopUp] = useState(false)
     const [currentSong, setCurrentSong] = useState()
     const [view, setView] = useState(false)
     const [roomInfo, setRoomInfo] = useState({ isHost: false })
+    const [contentHeight, setContentHeight] = useState(0)
+    const [musicViewHeight, setMusicViewHeight] = useState(0)
+    const [queueRef, queueHeight] = useMeasure()
+    const [musicRef, musicHeight] = useMeasure()
+
+    const containerResize = useSpring({
+        to: { height: view ? contentHeight : musicViewHeight }
+    })
 
     //when component mounts, it sets a timer to poll with the server
     useEffect(() => {
-        window.localStorage.setItem('code',code)
+        window.localStorage.setItem('code', code)
         getCurrentSong()
         getRoomInfo().then((roomInfo) => {
             if (roomInfo.isHost) {
@@ -39,10 +52,15 @@ const Room = () => {
         return () => {
             clearInterval(timerID)
             //if the host leaves then clean up the queue
-            fetch('/api/clearQueue',{method:'PUT'})
+            fetch('/api/clearQueue', { method: 'PUT' })
         }
         // eslint-disable-next-line
     }, [])
+
+    useEffect(() => {
+        setContentHeight(queueHeight.height)
+        setMusicViewHeight(musicHeight.height)
+    }, [queueHeight, musicHeight])
 
     const getAvailableDevices = async () => {
         const res = await fetch(`/spotify/getAvailableDevices`)
@@ -131,13 +149,18 @@ const Room = () => {
 
     return (
         <>
-            {displayPopUp && <PopUp hidePopUp={hidePopUp} usersCanPlayPause={roomInfo.usersCanPlayPause} usersCanQueue={roomInfo.usersCanQueue} usersCanSkip={roomInfo.usersCanSkip} votesToSkip={roomInfo.votesToSkip}/>}
+            {displayPopUp && <PopUp
+                hidePopUp={hidePopUp}
+                usersCanPlayPause={roomInfo.usersCanPlayPause}
+                usersCanQueue={roomInfo.usersCanQueue}
+                usersCanSkip={roomInfo.usersCanSkip}
+                votesToSkip={roomInfo.votesToSkip} />}
             <div className="roomContainer">
 
                 <div className="topHalf">
                     <div className="topItems">
                         <span className="roomCode">
-                            <h3 style={{fontSize:"1.58rem"}}>Code: {window.localStorage.getItem('code')}</h3>
+                            <h3 style={{ fontSize: "1.58rem" }}>Code: {window.localStorage.getItem('code')}</h3>
                         </span>
                         <div className="queueSwitch">
                             <FormControlLabel
@@ -149,36 +172,53 @@ const Room = () => {
                                         onChange={() => {
                                             setView(!view)
                                             playAnimation()
+
                                         }}
                                     />
                                 }
-                                label={<p className="attachAnimation" style={{ margin: '0' }}> {view ? 'Queue' : 'Music'}</p>}
+                                label={<p className="playAnimation" style={{ margin: '0' }}> {view ? 'Queue' : 'Music'}</p>}
                             />
                         </div>
                     </div>
 
-                    <div className="attachAnimation musicContainer">
+
+
+                    <animated.div className="musicContainer" style={containerResize}>
                         {/* switches between the music view or the queue view */}
-                        {!view ?
-                            <MusicPlayer roomInfo={roomInfo} currentSong={currentSong} pauseSong={()=>pauseSong(code)} playSong={()=>playSong(code)} skipSong={skipSong} />
-                            :
-                            <QueueView Queue={roomInfo.songQueue} code={code}/>
-                        }
-                        {!view &&
-                            <div className="bottomButtons">
-                                {(availableDevices !== undefined && roomInfo.isHost) &&
-                                    <div className="availableDevices">
-                                        <FadeMenu menuItems={availableDevices.devices} label="Listening Device" startPlaybackOnDevice={startPlaybackOnDevice}></FadeMenu>
-                                    </div>
-                                }
-                                {roomInfo.isHost &&
-                                    <div className="roomSettings">
-                                        <BlueButton style={{ marginLeft: '10px' }} onClick={() => setDisplayPopUp(!displayPopUp)}>Room Settings</BlueButton>
-                                    </div>
-                                }
-                            </div>
-                        }
-                    </div>
+                        <Transition
+                            items={view}
+                            from={{ opacity: 0 }}
+                            enter={{ opacity: 1 }}
+                            leave={{ display: 'none' }}
+                            delay={200}
+                            config={{ duration: 700 }}
+                        >
+                            {(view) => (
+                                !view
+                                    ? props =>
+                                        <div style={props} ref={musicRef}>
+                                            <MusicPlayer roomInfo={roomInfo} currentSong={currentSong} pauseSong={() => pauseSong(code)} playSong={() => playSong(code)} skipSong={skipSong} />
+                                            <div className="bottomButtons">
+                                                {(availableDevices !== undefined && roomInfo.isHost) &&
+                                                    <div className="availableDevices">
+                                                        <FadeMenu menuItems={availableDevices.devices} label="Listening Device" startPlaybackOnDevice={startPlaybackOnDevice}></FadeMenu>
+                                                    </div>
+                                                }
+                                                {roomInfo.isHost &&
+                                                    <div className="roomSettings">
+                                                        <BlueButton style={{ marginLeft: '10px' }} onClick={() => setDisplayPopUp(!displayPopUp)}>Room Settings</BlueButton>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+
+                                    : props =>
+                                        <div style={props} ref={queueRef}>
+                                            <QueueView Queue={roomInfo.songQueue} code={code} />
+                                        </div>
+                            )}
+                        </Transition>
+                    </animated.div>
                 </div>
                 <div className="bottomHalf">
 
