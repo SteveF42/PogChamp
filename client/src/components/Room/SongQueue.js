@@ -1,19 +1,29 @@
 import { Button } from '@material-ui/core'
 import { Add } from '@material-ui/icons'
-import { useTransition, animated } from 'react-spring'
+import { useTransition, animated,useSpring } from 'react-spring'
+import {useState} from 'react'
 import Song from './Song'
 
 const SongQueue = ({ changeSearchView, songQueue }) => {
+    const [bounce, setBounce] = useState(false)
+
     const queueAnimation = useTransition(songQueue, item => item._id, {
         from: { transform: 'translate3d(0,120px,0) scale(0)', opacity: 0 },
         enter: item => async (next, cancel) => {
             await next({ transform: 'translate3d(0,0,0) scale(1)', opacity: 1 })
         },
-        leave: item => async (next, cancel) => { await next({ transform: 'translate3d(0,-100px,0) scale(0)', opacity: 0,position:'absolute' }) },
+        leave: item => async (next, cancel) => { await next({ transform: 'translate3d(0,-25px,0) scale(1)', opacity: 0, position:'absolute'})},
         trail: 75,
-        reset: true
     })
-
+    const bounceUp = useSpring({
+        from: {transform:"translate3d(0,0,0)"},
+        to:{transform: bounce ? 'translate3d(0,-64,0)' : ''}
+    })
+    const clickEvent = e =>{
+        changeSearchView(e)
+        setBounce(false)
+        setBounce(true)
+    }
 
     return (
 
@@ -21,7 +31,7 @@ const SongQueue = ({ changeSearchView, songQueue }) => {
             <Button onClick={changeSearchView} style={{ color: 'white' }} startIcon={<Add />} >Add Song</Button>
             {queueAnimation.map(({ item, key, props }) => {
                 return (
-                    <animated.div key={key} style={props}>
+                    <animated.div key={key} style={bounceUp, props}>
                         <Song bandaid={true}
                             key={item._id}
                             artists={item.artists}
