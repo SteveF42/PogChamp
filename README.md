@@ -1,6 +1,6 @@
 # PogChamp
 Music player which allows anyone in a room to play a song through a host device
-<h1>PogChamp Music Player</h1>
+<h1>Info</h1>
 <p>PogChamp acts as a source controller for multiple people to queue, play, pause, and skip songs of their choosing</p>
 <p>Some upgrades I could plan would be to change how the client receieves information
   In it's current state the client is constantly polling the spotify api, which means if 50 people are connected to a room.
