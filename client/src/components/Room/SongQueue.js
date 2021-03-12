@@ -1,9 +1,6 @@
-import { useState, useEffect } from 'react'
-import { TextField, Button } from '@material-ui/core'
-import { Add, ArrowBack } from '@material-ui/icons'
-import { GreenButton } from '../Buttons'
+import { Button } from '@material-ui/core'
+import { Add } from '@material-ui/icons'
 import { useTransition, animated } from 'react-spring'
-import SearchSong from './SearchSong'
 import Song from './Song'
 
 const SongQueue = ({ changeSearchView, songQueue }) => {
@@ -12,7 +9,7 @@ const SongQueue = ({ changeSearchView, songQueue }) => {
         enter: item => async (next, cancel) => {
             await next({ transform: 'translate3d(0,0,0) scale(1)', opacity: 1 })
         },
-        leave: item => async (next, cancel) => { await next({ transform: 'translate3d(0,900px,0)', opacity: 0 }) },
+        leave: item => async (next, cancel) => { await next({ transform: 'translate3d(0,-100px,0) scale(0)', opacity: 0,position:'absolute' }) },
         trail: 75,
         reset: true
     })

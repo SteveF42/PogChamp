@@ -14,7 +14,6 @@ import './Room.css'
 const Room = () => {
     const code = window.localStorage.getItem('code') || window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1)
     const [availableDevices, setAvailableDevices] = useState()
-    const [animation, setAnimation] = useState(true)
     const [displayPopUp, setDisplayPopUp] = useState(false)
     const [currentSong, setCurrentSong] = useState()
     const [view, setView] = useState(false)
@@ -27,6 +26,7 @@ const Room = () => {
     const containerResize = useSpring({
         to: { height: view ? contentHeight : musicViewHeight }
     })
+
 
     //when component mounts, it sets a timer to poll with the server
     useEffect(() => {
@@ -149,12 +149,17 @@ const Room = () => {
 
     return (
         <>
-            {displayPopUp && <PopUp
-                hidePopUp={hidePopUp}
-                usersCanPlayPause={roomInfo.usersCanPlayPause}
-                usersCanQueue={roomInfo.usersCanQueue}
-                usersCanSkip={roomInfo.usersCanSkip}
-                votesToSkip={roomInfo.votesToSkip} />}
+            <Transition keys={displayPopUp} items={displayPopUp} from={{ opacity: 0 }} enter={{ opacity: 1 }} leave={{ opacity: 0 }} config={{duration:200}}>
+                {(displayPopUp) => displayPopUp && ((props) => (
+                            <PopUp
+                                props={props}
+                                hidePopUp={hidePopUp}
+                                usersCanPlayPause={roomInfo.usersCanPlayPause}
+                                usersCanQueue={roomInfo.usersCanQueue}
+                                usersCanSkip={roomInfo.usersCanSkip}
+                                votesToSkip={roomInfo.votesToSkip} />
+                    ))}
+            </Transition>
             <div className="roomContainer">
 
                 <div className="topHalf">

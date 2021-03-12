@@ -1,11 +1,6 @@
 import { useState, useEffect } from 'react'
-import { TextField, Button } from '@material-ui/core'
-import { Add, ArrowBack } from '@material-ui/icons'
-import { GreenButton } from '../Buttons'
-import { useTransition, animated } from 'react-spring'
 import SearchSong from './SearchSong'
 import SongQueue from './SongQueue'
-import Song from './Song'
 
 const QueueView = ({ Queue, code }) => {
     //map of objects to be filled from songs from spotify

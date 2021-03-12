@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react'
 import { TextField, Button } from '@material-ui/core'
-import { Add, ArrowBack } from '@material-ui/icons'
+import {  ArrowBack } from '@material-ui/icons'
 import { GreenButton } from '../Buttons'
 import { useTransition, animated } from 'react-spring'
 import Song from './Song'

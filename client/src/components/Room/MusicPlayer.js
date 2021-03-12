@@ -1,4 +1,4 @@
-import { useState,useEffect } from 'react'
+import { useState } from 'react'
 import { Button, LinearProgress } from '@material-ui/core'
 import { Pause, PlayArrow, SkipNext } from '@material-ui/icons'
 

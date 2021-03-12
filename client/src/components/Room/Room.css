@@ -70,7 +70,7 @@
 }
 
 .popUp{
-    z-index: 2;
+    z-index: 4;
     display: flex;
     position: fixed;
     align-items: center;
