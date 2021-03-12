@@ -1,3 +1,8 @@
+/* 
+    filename: Header.js
+    description: Header which holds the title
+*/
+
 import React from 'react'
 import {Link} from 'react-router-dom'
 

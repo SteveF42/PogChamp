@@ -1,3 +1,9 @@
+/* 
+    filename: MusicPlayer.js
+    description: Music player component which holds control over the given track
+        and what is currently playing
+*/
+
 import { useState } from 'react'
 import { Button, LinearProgress } from '@material-ui/core'
 import { Pause, PlayArrow, SkipNext } from '@material-ui/icons'

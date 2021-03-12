@@ -1,3 +1,7 @@
+/* 
+    filename: Host.js 
+    description: Allows user to log in to spotify and host their very own room
+*/
 import React from 'react'
 import { useState, useEffect } from 'react'
 import { TextField, Checkbox, FormControlLabel } from '@material-ui/core'

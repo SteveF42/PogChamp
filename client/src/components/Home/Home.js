@@ -1,3 +1,7 @@
+/* 
+    filename: Home.js 
+    description: home view which shows buttons to join or create a room
+*/
 import React from 'react'
 import './Home.css'
 import { Headset, PlayArrowOutlined } from '@material-ui/icons'

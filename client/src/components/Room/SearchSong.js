@@ -1,3 +1,8 @@
+/* 
+    filename: SearchSong.js
+    description: Allows user to search spotify API for songs
+*/
+
 import { TextField, Button } from '@material-ui/core'
 import {  ArrowBack } from '@material-ui/icons'
 import { GreenButton } from '../Buttons'

@@ -1,3 +1,8 @@
+/* 
+    filename: Buttons.js
+    description: contains buttons that are reused throughout the application
+*/
+
 import React from 'react'
 import { green, blue } from '@material-ui/core/colors'
 import { Button, Menu, MenuItem, withStyles, Fade } from '@material-ui/core'

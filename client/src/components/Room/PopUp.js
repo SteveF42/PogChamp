@@ -1,3 +1,8 @@
+/* 
+    filename: PopUp.js
+    description: allows host to alter room settings
+*/
+
 import { useState } from 'react'
 import { TextField, Checkbox, FormControlLabel, withStyles } from '@material-ui/core'
 import { green } from '@material-ui/core/colors'

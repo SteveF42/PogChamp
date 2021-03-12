@@ -1,3 +1,9 @@
+/*
+    FileName: AuthCallback.js
+    description: only used to receieve a call back after logging into spotify
+        clears the window history to hide the codes receieved
+*/
+
 import {useEffect} from 'react'
 
 const AuthCallback = () => {

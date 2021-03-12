@@ -1,3 +1,7 @@
+/* 
+    filename: SongQueue.js 
+    description: shows the current song queue of whats next
+*/
 import { Button } from '@material-ui/core'
 import { Add } from '@material-ui/icons'
 import { useTransition, animated,useSpring } from 'react-spring'

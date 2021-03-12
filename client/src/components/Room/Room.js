@@ -1,3 +1,8 @@
+/* 
+    filename: Room.js
+    description: main room component that allows users to join
+*/
+
 import { useMeasure } from 'react-use'
 import { useEffect, useState } from 'react'
 import React from 'react'

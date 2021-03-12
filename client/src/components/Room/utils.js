@@ -1,3 +1,8 @@
+/* 
+    filename: utils.js 
+    description: helper functions that get called throughout room component
+*/
+
 //pauses the song
 export const pauseSong = async (code) => {
     console.log('pause')

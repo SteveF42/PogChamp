@@ -1,3 +1,7 @@
+/* 
+    filename: Join.js 
+    description: Allows user to input code and join a room
+*/
 import { useState } from 'react'
 import { TextField, withStyles, FormHelperText } from '@material-ui/core'
 import { green } from '@material-ui/core/colors'

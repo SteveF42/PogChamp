@@ -1,3 +1,8 @@
+/* 
+    filename: QueueView.js
+    description: show the current song queue of the room and allows user to search spotify api
+*/
+
 import { useState, useEffect } from 'react'
 import SearchSong from './SearchSong'
 import SongQueue from './SongQueue'

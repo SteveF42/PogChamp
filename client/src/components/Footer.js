@@ -1,3 +1,8 @@
+/* 
+    filename: Footer.js
+    description: Footer component, contains information
+*/
+
 import React from 'react'
 import './Footer.css'
 

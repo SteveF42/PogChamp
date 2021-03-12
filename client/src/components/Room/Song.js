@@ -1,3 +1,8 @@
+/* 
+    filename: Song.js 
+    description: Song component which gets mapped to from an array
+*/
+
 import { PlayArrow, QueueMusic } from '@material-ui/icons'
 import { Button } from '@material-ui/core'
 import { playSong } from './utils'
