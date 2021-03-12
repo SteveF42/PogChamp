@@ -114,16 +114,21 @@ const callSpotifyApi = async (endpoint, hostSession, method,body={}) => {
 }
 
 const updateSongQueue = async (code,hostSession)=>{
-    const room = await Rooms.findOne({code:code});
+    try{
 
-    if(room.songQueue.length === 0) return;
-
-    let songResponse = await callSpotifyApi('me/player/currently-playing',hostSession,'GET')
-    let songData = await songResponse.json()
-    //if the current song is the first on in the queue then we gotta pop it from the queue
-    if(songData.item.name === room.songQueue[0].songName){
-        room.songQueue.shift()
-        room.save()
+        const room = await Rooms.findOne({code:code});
+        
+        
+        if(room.songQueue.length === 0) return;
+        
+        let songResponse = await callSpotifyApi('me/player/currently-playing',hostSession,'GET')
+        let songData = await songResponse.json()
+        //if the current song is the first on in the queue then we gotta pop it from the queue
+        if(songData.item.name === room.songQueue[0].songName){
+            room.songQueue.shift()
+            room.save()
+        }
+    }catch(err){
     }
 }
 

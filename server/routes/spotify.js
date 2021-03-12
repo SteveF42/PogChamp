@@ -4,6 +4,7 @@ const {isAuthenticated,refreshTokens,updateOrCreateTokens,callSpotifyApi,updateS
 const Rooms = require('../database/Models/room')
 const Tokens = require('../database/Models/tokens')
 const querystring = require('querystring')
+const { isatty } = require('tty')
 require('dotenv')
 
 Date.prototype.addHours = function (h) {
@@ -166,6 +167,10 @@ router.post('/currentlyPlaying', async (req,res) => {
     const apiEndPoint = 'me/player/currently-playing'
     const room = await Rooms.findOne({code:req.body.code})
     if(room == null){res.status(404).json({message:'not found'});return}
+
+    if(req.sessionID===room.host){
+        isAuthenticated(req.sessionID)
+    }
 
     const host = room.host
     const response = await callSpotifyApi(apiEndPoint,host,'GET')
