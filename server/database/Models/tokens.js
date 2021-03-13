@@ -1,3 +1,7 @@
+/* 
+    filename: tokens.js 
+    description: token schema for mongodb
+*/
 const mongoose = require('mongoose')
 
 const tokenSchema = mongoose.Schema({

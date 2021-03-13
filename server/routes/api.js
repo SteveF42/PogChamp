@@ -1,3 +1,7 @@
+/* 
+    filename: api.js 
+    description: main api for creating and updating rooms that are created
+*/
 const router = require('express').Router()
 const Rooms = require('../database/Models/room')
 const randomCode = require('random-key')
@@ -25,7 +29,6 @@ router.post('/createRoom', async (req, res) => {
             })
             const savedRoom = await newRoom.save()
             res.status(201).json({ Room: savedRoom })
-            console.log(savedRoom)
 
             //otherwise give a response that lets the user know that they already have a current room 
         } else {

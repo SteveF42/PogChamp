@@ -14,10 +14,13 @@ import MusicPlayer from './MusicPlayer'
 import PopUp from './PopUp'
 import QueueView from './QueueView'
 import { pauseSong, playSong, skipSong } from './utils'
+import socketIOClient from 'socket.io-client'
 import './Room.css'
 
 const Room = () => {
     const code = window.localStorage.getItem('code') || window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1)
+    const [clientSocket, setClientSocket] = useState('')
+    const [timerID, setTimerID] = useState('')
     const [availableDevices, setAvailableDevices] = useState()
     const [displayPopUp, setDisplayPopUp] = useState(false)
     const [currentSong, setCurrentSong] = useState()
@@ -35,29 +38,47 @@ const Room = () => {
 
     //when component mounts, it sets a timer to poll with the server
     useEffect(() => {
+        //joins socket on mount
+        const socket = socketIOClient('',{withCredentials:true})
+
+        console.log(socket)
+        setClientSocket(socket)
+        socket.emit('joinRoom',code)
+        socket.on('currentSong',currentSong=>{
+            setCurrentSong(currentSong)
+        })
+        socket.on('roomInfo',roomInfo=>{
+            setRoomInfo(roomInfo)
+        })
+
         window.localStorage.setItem('code', code)
         getCurrentSong()
         getRoomInfo().then((roomInfo) => {
             if (roomInfo.isHost) {
                 getAvailableDevices()
+                //makes sure only host can get the current song
+                const ID = setInterval(() => {
+                    getCurrentSong().then(songInfo=>{
+                        if(songInfo!==undefined)
+                            socket.emit('shareCurrentSong',songInfo,code)
+                    })
+                    getRoomInfo().then(roomInfo=>{
+                        if(roomInfo!==undefined)
+                            socket.emit('shareRoomInfo',roomInfo,code)
+                    })
+                }, 2500)
+                setTimerID(ID)
             } else {
                 setAvailableDevices({ isHost: false })
-            }
+            }    
         })
 
         //keeps a constant poll to the server
-        const timerID = setInterval(() => {
-            getCurrentSong()
-            getRoomInfo()
-            // if(roomInfo.isHost){
-            //     fetch('/spotify/isAuthenticated')
-            // }
-        }, 2500)
-
         return () => {
             clearInterval(timerID)
+            socket.disconnect();
             //if the host leaves then clean up the queue
-            fetch('/api/clearQueue', { method: 'PUT' })
+            fetch('/api/clearQueue', { method: 'PUT' }).then(res=>{})
         }
         // eslint-disable-next-line
     }, [])
@@ -110,6 +131,7 @@ const Room = () => {
         if (currentSong === undefined || currentSong.item !== data.song.item) {
             if (data.song !== null && data.song.item != null) {
                 setCurrentSong(data.song)
+                return data.song
             }
         }
     }
@@ -207,7 +229,7 @@ const Room = () => {
                                 !view
                                     ? props =>
                                         <div style={props} ref={musicRef}>
-                                            <MusicPlayer roomInfo={roomInfo} currentSong={currentSong} pauseSong={() => pauseSong(code)} playSong={() => playSong(code)} skipSong={skipSong} />
+                                            <MusicPlayer code={code} roomInfo={roomInfo} currentSong={currentSong} pauseSong={() => pauseSong(code)} playSong={() => playSong(code)} skipSong={skipSong} />
                                             <div className="bottomButtons">
                                                 {(availableDevices !== undefined && roomInfo.isHost) &&
                                                     <div className="availableDevices">

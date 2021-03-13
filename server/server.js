@@ -8,8 +8,21 @@ const spotify = require('./routes/spotify')
 const db = require('./database/mongodb')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
+const io = require('socket.io')(server,{
+    cors:{
+        origin:'http://localhost:3000',
+        methods:["GET","POST"],
+        credentials:true,
+    }
+})
+
+/* 
+    filename: server.js 
+    description: main entry point of the application
+*/
 const cors = require('cors')
-const path = require('path')
+const path = require('path');
+const room = require('./database/Models/room');
 require('dotenv').config()
 
 db.connect((err) => {
@@ -21,10 +34,10 @@ db.connect((err) => {
     }
 })
 
-app.use(express.static(path.join(__dirname,'build')))
+app.use(express.static(path.join(__dirname, 'build')))
 
 //middleware
-app.use(cors({origin:'http://localhost:3000',credentials:true}))
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }))
 app.use(session({
     secret: process.env.SECRET_KEY,
     store: new MongoStore({
@@ -33,20 +46,44 @@ app.use(session({
     }),
     resave: false,
     saveUninitialized: true,
-    cookie:{
-        httpOnly:true,
+    cookie: {
+        httpOnly: true,
     }
 }))
 
 app.use(bodyParser.urlencoded({
-    extended:true
+    extended: true
 }))
 app.use(express.json())
 
 
-app.use('/api',api)
+app.use('/api', api)
 app.use('/spotify', spotify)
-app.use('*',(req,res)=>{
-    res.sendFile('build/index.html',{root:'./server'})
+app.use('*', (req, res) => {
+    res.sendFile('build/index.html', { root: './server' })
 })
 
+io.on('connection', (socket) => {
+    //when user joins room assign them to their room code
+    socket.on('joinRoom', (code) => {
+        socket.join(code)
+    })
+    //when host gets the current song they'll share it to others in the room
+    socket.on('shareCurrentSong', (currentSong, code) => {
+        socket.broadcast.to(code).emit('currentSong', { ...currentSong, isHost: false })
+    })
+    //shares the roomInfo from the host
+    socket.on('shareRoomInfo', (roomInfo, code) => {
+        socket.broadcast.to(code).emit('roomInfo', { ...roomInfo, isHost: false })
+    })
+    socket.on('play', (code) => {
+        console.log('play',code)
+        io.to(code).emit('isPlaying', true)
+
+    })
+    socket.on('pause', (code) => {
+        console.log('pause',code)
+        io.to(code).emit('isPaused', false)
+
+    })
+})

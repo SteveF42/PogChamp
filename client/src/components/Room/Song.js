@@ -7,7 +7,8 @@ import { PlayArrow, QueueMusic } from '@material-ui/icons'
 import { Button } from '@material-ui/core'
 import { playSong } from './utils'
 
-const Song = ({ bandaid = false, imgSrc, artists, songName, songLength, dimensions, context_uri, trackNumber, spotifyTrack, displayButtons }) => {
+const Song = ({playEvent, bandaid = false, imgSrc, artists, songName, songLength, dimensions, context_uri, trackNumber, spotifyTrack, displayButtons }) => {
+
 
     const onSongEvent = () => {
         const params = {
@@ -15,6 +16,7 @@ const Song = ({ bandaid = false, imgSrc, artists, songName, songLength, dimensio
             offset: trackNumber - 1
         }
         playSong(window.localStorage.getItem('code'), params)
+        playEvent()
     }
 
     const addToQueue = async () => {

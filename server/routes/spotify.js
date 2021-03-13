@@ -1,3 +1,8 @@
+/* 
+    filename: spotify.js 
+    description: spotify routes which control playing,pausing,choosing songs
+        , fetching current song, and skipping songs
+*/
 const router = require('express').Router()
 const fetch = require('node-fetch')
 const {isAuthenticated,refreshTokens,updateOrCreateTokens,callSpotifyApi,updateSongQueue} = require('./spotifyUtils/utils')

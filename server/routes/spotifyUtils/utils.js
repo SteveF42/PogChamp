@@ -1,3 +1,7 @@
+/* 
+    filename: utils.js 
+    description: spotify helper functions that get called
+*/
 const Tokens = require('../../database/Models/tokens')
 const fetch = require('node-fetch')
 const Rooms = require('../../database/Models/room')
@@ -34,7 +38,7 @@ const isAuthenticated = async (sessionID) => {
     if (tokens != null) {
         //checks if the expiry date is up so it can be refreshed
 
-        console.log(tokens.expires_in < date, tokens.expires_in, date)
+        // console.log("tokens Expired? " + tokens.expires_in < date, tokens.expires_in, date)
 
         //if for some reason the user revoked access they'll need to login again
         if (tokens.expires_in <= date) {

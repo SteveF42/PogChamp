@@ -7,9 +7,14 @@ import { TextField, Button } from '@material-ui/core'
 import {  ArrowBack } from '@material-ui/icons'
 import { GreenButton } from '../Buttons'
 import { useTransition, animated } from 'react-spring'
+import socketIOClient from 'socket.io-client'
+import {useEffect,useState} from 'react'
 import Song from './Song'
 
 const SearchComponent = ({searchItems, changeSearchView,setQuaryParams,searchSong}) => {
+    const [IO, setIO] = useState('')
+
+    
     const searchAnimation = useTransition(searchItems, item => item.id, {
         from: { transform: 'translate3d(0,120px,0) scale(0)', opacity: 0 },
         enter: item => async (next, cancel) => {
@@ -18,6 +23,21 @@ const SearchComponent = ({searchItems, changeSearchView,setQuaryParams,searchSon
         leave: { display: 'none' },
         trail: 125,
     })
+
+
+    useEffect(() => {
+        const socket = socketIOClient('',{withCredentials:true})
+
+        setIO(socket)
+        socket.emit('joinRoom',window.localStorage.getItem('code'))
+        return () => {
+            socket.disconnect()
+        }
+    }, [])
+
+    const playEvent = ()=>{
+        IO.emit('play',window.localStorage.getItem('code'))
+    }
 
     return (
         <div className="searchSong">
@@ -40,7 +60,9 @@ const SearchComponent = ({searchItems, changeSearchView,setQuaryParams,searchSon
                                 context_uri={item.album.uri}
                                 trackNumber={item.track_number}
                                 spotifyTrack={item.uri}
-                                displayButtons={true} />
+                                displayButtons={true} 
+                                playEvent={playEvent}
+                                />
                         </animated.div>
                     )
                 })}

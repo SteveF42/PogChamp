@@ -4,18 +4,43 @@
         and what is currently playing
 */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button, LinearProgress } from '@material-ui/core'
 import { Pause, PlayArrow, SkipNext } from '@material-ui/icons'
+import socketIOClient from 'socket.io-client'
 
-
-const MusicPlayer = ({ currentSong, playSong, pauseSong, skipSong, roomInfo }) => {
+const MusicPlayer = ({ currentSong, playSong, pauseSong, skipSong, roomInfo, code }) => {
     const [isPlaying, setIsPlaying] = useState(currentSong === undefined ? false : currentSong.is_playing)
     const [voted, setVoted] = useState(false)
+    const [IO, setIO] = useState('')
+
     const playOrPause = async () => {
-        isPlaying ? pauseSong() : playSong();
+        if (isPlaying) {
+            pauseSong()
+            IO.emit('pause', code)
+        } else {
+            playSong()
+            IO.emit('play', code)
+        }
         setIsPlaying(!isPlaying)
     }
+
+    useEffect(() => {
+        const socket = socketIOClient('',{withCredentials:true})
+        setIO(socket)
+        socket.emit('joinRoom', code)
+        socket.on('isPlaying', (data) => {
+            setIsPlaying(data)
+            console.log(data)
+        })
+        socket.on('isPaused', (data) => {
+            setIsPlaying(data)
+            console.log(data)
+        })
+        return () => {
+            socket.disconnect()
+        }
+    }, [])
     const styles = {
         playPause: {
             color: (roomInfo.usersCanPlayPause || roomInfo.isHost) ? 'white' : 'grey'
@@ -24,6 +49,7 @@ const MusicPlayer = ({ currentSong, playSong, pauseSong, skipSong, roomInfo }) =
             color: (roomInfo.usersCanSkip || roomInfo.isHost) ? 'white' : 'grey'
         }
     }
+
     return (
         <>
             {currentSong !== undefined &&

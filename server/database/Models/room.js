@@ -1,6 +1,9 @@
+/* 
+    filename: room.js 
+    description: room schema for monogdb
+*/
 const mongoose = require('mongoose')
 require('mongoose-type-url')
-
 
 
 const RoomSchema = new mongoose.Schema({

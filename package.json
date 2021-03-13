@@ -30,7 +30,9 @@
     "mongoose": "^5.11.18",
     "mongoose-type-url": "^2.1.0",
     "node-fetch": "^2.6.1",
-    "random-key": "^0.3.2"
+    "random-key": "^0.3.2",
+    "react-transition-group": "^4.4.1",
+    "socket.io": "^4.0.0"
   },
   "devDependencies": {
     "concurrently": "^5.3.0",
