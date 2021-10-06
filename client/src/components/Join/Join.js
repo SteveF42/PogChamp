@@ -41,13 +41,24 @@ const Create = () => {
     const [error, setError] = useState(false)
     const [helperText, setHelperText] = useState('')
     const [code, setCode] = useState('')
+    const [password,setPassword] = useState('')
 
     const onRoomJoin = async (e) => {
         console.log(code)
-        const res = await fetch(`/api/getRoom/${code}`)
+        const data = {code,password}
+        // const res = await fetch(`/api/getRoom/${code}`)
+        const res = await fetch('/api/checkPassword',{
+            method:"POST",
+            credentials:"include",
+            headers:{
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+
         if (res.status === 404) {
             setError(true)
-            setHelperText('invalid room code')
+            setHelperText('invalid room code/password')
             e.target.value=''
         }
         if(res.status===200){
@@ -58,7 +69,9 @@ const Create = () => {
 
     return (
         <div className="container join-container">
-            <TextStyled error={error} variant="outlined" label="Input Room Code" value={code} onChange={(e)=>setCode(e.target.value.toUpperCase())}/>
+            <TextStyled style={{padding:'0 0 15px 0'}} error={error} variant="outlined" label="Input Room Code" value={code} onChange={(e)=>setCode(e.target.value.toUpperCase())}/>
+            <TextStyled style={{padding:'0 0 0 0'}} error={error} variant="outlined" label="Input Password" value={password} onChange={(e)=>setPassword(e.target.value)}/>
+            
             <FormHelperText error={error}>{helperText}</FormHelperText>
             <div className="bottom">
                 <GreenButton onClick={onRoomJoin} size="large" className="btn">JOIN</GreenButton>

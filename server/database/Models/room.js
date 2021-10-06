@@ -11,6 +11,8 @@ const RoomSchema = new mongoose.Schema({
     usersCanQueue: {type:Boolean, required:true, defualt: false},
     usersCanSkip: {type:Boolean, required:true,default: false},
     usersCanPlayPause:{type:Boolean, required:true, default: false},
+    setPassword:{type:Boolean, require:true, default:false},
+    roomPassword:{type:String, require:true, default:''},
     expireAt: {type:Date, index:{expireAfterSeconds:0}},
     songQueue:[{
         imgSrc: mongoose.SchemaTypes.Url,

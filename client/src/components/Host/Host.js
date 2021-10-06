@@ -54,6 +54,9 @@ const Host = () => {
     const [allowSkip, setAllowSkip] = useState(false)
     const [allowPlayPause, setAllowPlayPause] = useState(false)
     const [votesToSkip, setVotesToSkip] = useState(1)
+    const [roomPassCode, setRoomPassCode] = useState('')
+    const [usePassCode, setUsePassCode] = useState(false)
+    
 
 
     useEffect(() => {
@@ -98,7 +101,9 @@ const Host = () => {
                 usersCanQueue: allowQueue,
                 usersCanPlayPause: allowPlayPause,
                 usersCanSkip: allowSkip,
-                override: session != null
+                override: session != null,
+                roomPassword: roomPassCode,
+                setPassword: usePassCode
             }
 
             const res = await fetch('/api/createRoom', {
@@ -156,6 +161,11 @@ const Host = () => {
                                 control={<CustomCheckBox color="default" onClick={() => setAllowPlayPause(!allowPlayPause)} />}
                                 label="Allow users to Play/Pause music"
                             />
+                            <FormControlLabel 
+                                control = {<CustomCheckBox color="default" onClick={()=> setUsePassCode(!usePassCode)}/>}
+                                label="Set Room Password"
+                            />
+                            {usePassCode == true && <TextStyled id="outlined-basic" label="Password" variant="outlined" style={{width:"100%"}} onChange={(e) => setRoomPassCode(e.target.value)}/>}
                         </div>
                     </div>
                 </div>
