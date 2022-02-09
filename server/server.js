@@ -17,7 +17,7 @@ db.connect((err) => {
         console.log('unable to connect to database, exiting...')
     } else {
         console.log('server running on port 5000')
-        server.listen(5000)
+        server.listen(5000,"0.0.0.0")
     }
 })
 
@@ -49,4 +49,3 @@ app.use('/spotify', spotify)
 app.use('*',(req,res)=>{
     res.sendFile('build/index.html',{root:'./server'})
 })
-

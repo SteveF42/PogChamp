@@ -19,8 +19,10 @@ router.post('/createRoom', async (req, res) => {
                 usersCanQueue: req.body.usersCanQueue,
                 usersCanPlayPause: req.body.usersCanPlayPause,
                 usersCanSkip: req.body.usersCanSkip,
+                setPassword: req.body.setPassword,
+                roomPassword: req.body.roomPassword,
                 expireAt: date,
-                songQueue:[],
+                songQueue: [],
                 currentVotes: 0
             })
             const savedRoom = await newRoom.save()
@@ -39,6 +41,8 @@ router.post('/createRoom', async (req, res) => {
                 RoomFound.expireAt = date
                 RoomFound.songQueue = []
                 RoomFound.currentVotes = 0;
+                RoomFound.setPassword = req.body.setPassword
+                RoomFound.roomPassword = req.body.roomPassword
                 const savedRoom = await RoomFound.save()
                 res.status(201).json({ Room: savedRoom })
             } else {
@@ -69,81 +73,104 @@ router.get('/createRoom', async (req, res) => {
     }
 })
 
-router.get('/getRoom/:code', async(req, res) => {
+router.get('/getRoom/:code', async (req, res) => {
     const code = req.params.code
-    const room = await Rooms.findOne({code:code})
-    if(room == null){
-        res.status(404).json({message:'Not Found'})
+    const room = await Rooms.findOne({ code: code })
+    if (room == null) {
+        res.status(404).json({ message: 'Not Found' })
         return
     }
-    
+
     const response = {
         isHost: req.sessionID === room.host,
         code: room.code,
         usersCanQueue: room.usersCanQueue,
         usersCanSkip: room.usersCanSkip,
-        usersCanPlayPause:room.usersCanPlayPause,
+        usersCanPlayPause: room.usersCanPlayPause,
         songQueue: room.songQueue,
         currentVotes: room.currentVotes,
         votesToSkip: room.votesToSkip
     }
-    res.status(200).json({roomInfo:response})
+    res.status(200).json({ roomInfo: response })
 })
 module.exports = router
 
 //only host can update the room
-router.post('/updateRoom', async(req,res)=>{
-    if(req.body.updatePermissions){
+router.post('/updateRoom', async (req, res) => {
+    if (req.body.updatePermissions) {
 
-        try{
-            const room = await Rooms.findOne({host:req.sessionID})
+        try {
+            const room = await Rooms.findOne({ host: req.sessionID })
             room.votesToSkip = req.body.votesToSkip
             room.usersCanQueue = req.body.usersCanQueue
             room.usersCanPlayPause = req.body.usersCanPlayPause
             room.usersCanSkip = req.body.usersCanSkip
-            
+
             room.save()
-            res.status(202).json({message:'accepted'})
-        }catch(err){
-            res.status(501).json({message:err})
+            res.status(202).json({ message: 'accepted' })
+        } catch (err) {
+            res.status(501).json({ message: err })
         }
     }
-    if(req.body.queueSong){
-        const room = await Rooms.findOne({code:req.body.code})
-        if(room.usersCanQueue || req.sessionID===room.host){            
+    if (req.body.queueSong) {
+        const room = await Rooms.findOne({ code: req.body.code })
+        if (room.usersCanQueue || req.sessionID === room.host) {
             const data = {
                 imgSrc: req.body.imgSrc,
                 artists: req.body.artists,
-                songName:req.body.songName,
-                songLength:req.body.songLength,
+                songName: req.body.songName,
+                songLength: req.body.songLength,
                 context_uri: req.body.context_uri,
                 trackNumber: req.body.trackNumber
             }
             room.songQueue.push(data)
             room.save()
-            res.status(201).json({message:'accepted'})
+            res.status(201).json({ message: 'accepted' })
         }
     }
-    if(req.body.updateQueue){
-        const room = await Rooms.findOne({code:req.body.code})
-        if(room.usersCanQueue|| req.sessionID===room.host){
+    if (req.body.updateQueue) {
+        const room = await Rooms.findOne({ code: req.body.code })
+        if (room.usersCanQueue || req.sessionID === room.host) {
             room.songQueue = req.body.newQueue
         }
         room.save()
-        res.status(201).json({message:'accepted'})
+        res.status(201).json({ message: 'accepted' })
     }
 
 })
 
-router.put('/clearQueue', async(req,res)=>{
-    const room = await Rooms.findOne({host:req.sessionID})
-    if(room == null){
+router.put('/clearQueue', async (req, res) => {
+    const room = await Rooms.findOne({ host: req.sessionID })
+    if (room == null) {
         res.status(404)
         return
     }
-    
+
     room.songQueue = []
     console.log('room queue cleared')
     room.save();
     res.status(202)
+})
+
+router.post('/checkPassword', async (req, res) => {
+    const password = req.body.password
+    const code = req.body.code
+
+    const room = await Rooms.findOne({ code: code })
+    if (room == null || room.roomPassword != password) {
+        res.status(404).json({ message: 'Not Found' })
+        return
+    }
+
+    const response = {
+        isHost: req.sessionID === room.host,
+        code: room.code,
+        usersCanQueue: room.usersCanQueue,
+        usersCanSkip: room.usersCanSkip,
+        usersCanPlayPause: room.usersCanPlayPause,
+        songQueue: room.songQueue,
+        currentVotes: room.currentVotes,
+        votesToSkip: room.votesToSkip
+    }
+    res.status(200).json({ roomInfo: response })
 })
